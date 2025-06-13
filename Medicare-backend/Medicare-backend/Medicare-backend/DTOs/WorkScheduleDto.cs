@@ -19,7 +19,7 @@
         public int ClinicId { get; set; }
         public int ServiceId { get; set; }
         public DateTime WorkDate { get; set; }
-        public string WorkTime { get; set; }
+        public string? WorkTime { get; set; }
     }
 
     public class UpdateWorkScheduleDto

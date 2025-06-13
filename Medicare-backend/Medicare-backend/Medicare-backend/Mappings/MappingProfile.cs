@@ -12,8 +12,7 @@ namespace Medicare_backend.Mappings
 
             CreateMap<Clinic, ClinicDto>().ReverseMap();
 
-            CreateMap<Doctor, DoctorDto>()
-                .ForMember(dest => dest.SpecialtyName, opt => opt.MapFrom(src => src.Specialty.SpecialtyName));
+            CreateMap<Doctor, DoctorDto>().ReverseMap();
 
             CreateMap<Service, ServiceDto>().ReverseMap();
 

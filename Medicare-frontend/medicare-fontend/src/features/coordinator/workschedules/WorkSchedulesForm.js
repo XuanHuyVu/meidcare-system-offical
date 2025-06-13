@@ -107,21 +107,26 @@ const WorkScheduleForm = ({ onClose, onSubmit, editingSchedule = null }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Đã ấn submit');
     if (validateForm()) {
       const payload = {
-        doctorId: parseInt(formData.doctorId),
-        specialtyId: parseInt(formData.specialtyId),
-        workDate: formData.workDate,
+        doctorId: parseInt(formData.doctorId,10),
+        specialtyId: parseInt(formData.specialtyId,10),
+        clinicId: parseInt(formData.clinicId,10),
+        serviceId: parseInt(formData.serviceId,10),
+        workDate: formData.workDate ? new Date(formData.workDate).toISOString() : null,
         workTime: formData.workTime,
-        clinicId: parseInt(formData.clinicId),
-        serviceId: parseInt(formData.serviceId),
-        status: formData.status,
       };
-      console.log('Form hợp lệ, gửi dữ liệu:', payload);
+      console.log('Payload gửi lên:', payload);
+      if (
+        isNaN(parseInt(formData.doctorId)) ||
+        isNaN(parseInt(formData.specialtyId)) ||
+        isNaN(parseInt(formData.clinicId)) ||
+        isNaN(parseInt(formData.serviceId))
+      ) {
+        alert("Các trường ID phải là số hợp lệ.");
+        return;
+      }
       onSubmit(payload);
-    } else {
-      console.log('Form KHÔNG hợp lệ');
     }
   };
 
@@ -147,9 +152,9 @@ const WorkScheduleForm = ({ onClose, onSubmit, editingSchedule = null }) => {
             <div className="w-form-group full-width">
               <label htmlFor="doctorId">Tên bác sĩ: <span className="required">*</span></label>
               <select id="doctorId" name="doctorId" value={formData.doctorId} onChange={handleInputChange} className={errors.doctorId ? 'error' : ''}>
-                <option  value="">-- Chọn bác sĩ --</option>
-                {doctors.filter(Boolean).map((doctor,index) => (
-                  <option key={doctor.id || `doctor-${index}`} value={doctor.id}>
+                <option value="">-- Chọn bác sĩ --</option>
+                {doctors.filter(Boolean).map((doctor, index) => (
+                  <option key={doctor.id || `doctor-${index}`} value={doctor.id?.toString()}>
                     {doctor.fullName}
                   </option>
                 ))}
@@ -235,7 +240,7 @@ const WorkScheduleForm = ({ onClose, onSubmit, editingSchedule = null }) => {
       <ConfirmModal
         open={showCancelModal}
         title="XÁC NHẬN THOÁT"
-        message={editingSchedule ? 'Bạn có muốn thoát khỏi chức năng sửa lịch làm việc không?' : 'Bạn có muốn thoát khỏi chức năng tạo lịch làm việc không?'}
+        message={editingSchedule ? 'Bạn có muốn thoát khỏi chức năng chỉnh sửa lịch làm việc không?' : 'Bạn có muốn thoát khỏi chức năng tạo lịch làm việc không?'}
         onConfirm={onClose}
         onCancel={() => setShowCancelModal(false)}
       />

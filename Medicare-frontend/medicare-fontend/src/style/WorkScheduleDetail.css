@@ -125,14 +125,6 @@
   transition: all 0.2s ease;
 }
 
-.workschedule-detail-row:nth-child(odd) {
-  background: #ffffff;
-}
-
-.workschedule-detail-row:nth-child(odd):hover {
-  background: #f8f9fa;
-}
-
 /* Labels */
 .workschedule-detail-label {
   font-weight: 600;
@@ -171,57 +163,10 @@
   color: #495057;
 }
 
-.workschedule-detail-value.date {
-  font-weight: 500;
-  color: #1D479A;
-}
-
-.workschedule-detail-value.time {
-  font-weight: 600;
-  color: #198754;
-  background: #d1e7dd;
-  padding: 4px 8px;
-  border-radius: 4px;
-  display: inline-block;
-}
-
 .workschedule-detail-value.count {
   font-weight: bold;
   font-size: 16px;
   color: #fd7e14;
-}
-
-/* Status Badge */
-.workschedule-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.workschedule-status-badge::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.8;
-}
-
-.workschedule-status-badge.scheduled {
-  background: linear-gradient(45deg, #28a745, #20c997);
-  color: white;
-}
-
-.workschedule-status-badge.unscheduled {
-  background: linear-gradient(45deg, #ffc107, #fd7e14);
-  color: #212529;
 }
 
 .workschedule-status-badge.cancelled {
@@ -338,4 +283,8 @@
   .workschedule-detail-overlay {
     padding: 0;
   }
+}
+
+.workschedule-detail-row-1 {
+  border-left-color: #007bff;
 }

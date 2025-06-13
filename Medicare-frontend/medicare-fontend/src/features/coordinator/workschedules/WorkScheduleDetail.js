@@ -84,43 +84,6 @@ const WorkScheduleDetail = ({ open, schedule, onClose }) => {
                   {schedule.status || 'Không xác định'}
                 </span>
               </div>
-
-              {schedule.maxPatients && (
-                <div className="workschedule-detail-row">
-                  <label className="workschedule-detail-label">Số BN tối đa:</label>
-                  <span className="workschedule-detail-value count">{schedule.maxPatients}</span>
-                </div>
-              )}
-
-              {schedule.currentPatients !== undefined && (
-                <div className="workschedule-detail-row">
-                  <label className="workschedule-detail-label">Số BN hiện tại:</label>
-                  <span className="workschedule-detail-value count">{schedule.currentPatients}</span>
-                </div>
-              )}
-
-              {schedule.createdAt && (
-                <div className="workschedule-detail-row">
-                  <label className="workschedule-detail-label">Ngày tạo:</label>
-                  <span className="workschedule-detail-value date">{formatDate(schedule.createdAt)}</span>
-                </div>
-              )}
-
-              {schedule.updatedAt && (
-                <div className="workschedule-detail-row">
-                  <label className="workschedule-detail-label">Cập nhật cuối:</label>
-                  <span className="workschedule-detail-value date">{formatDate(schedule.updatedAt)}</span>
-                </div>
-              )}
-
-              {schedule.notes && (
-                <div className="workschedule-detail-row">
-                  <label className="workschedule-detail-label">Ghi chú:</label>
-                  <div className="workschedule-detail-notes">
-                    <span className="workschedule-detail-value">{schedule.notes}</span>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
