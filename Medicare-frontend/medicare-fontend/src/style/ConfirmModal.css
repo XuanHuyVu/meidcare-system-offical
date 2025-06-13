@@ -1,0 +1,105 @@
+.confirm-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+.confirm-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 0;
+  min-width: 300px;
+  max-width: 400px;
+  width: 100%;
+  border: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.confirm-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1D479A;
+  padding: 4px 12px;
+  border-radius: 8px 8px 0 0;
+  color: white;
+  font-weight: 500;
+  font-size: 15px;
+  border: none;
+  box-sizing: border-box;
+  min-height: 36px;
+  letter-spacing: 0.5px;
+}
+.confirm-modal-header .modal-title {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.2;
+}
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  color: white;
+}
+.close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.confirm-modal-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+}
+.confirm-modal-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.modal-message {
+  flex-grow: 1;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.4;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 16px 16px 16px;
+  background: white;
+}
+.modal-btn {
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+}
+.modal-btn.confirm {
+  background-color: #1D479A;
+  color: white;
+  border: none;
+  box-shadow: none;
+}
+.modal-btn.confirm:hover {
+  background-color: #153e7e;
+}
+.modal-btn.cancel {
+  background-color: #fff;
+  color: #999;
+  border: 1px solid #ccc;
+}
+.modal-btn.cancel:hover {
+  background-color: #f2f2f2;
+}

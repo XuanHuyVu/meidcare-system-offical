@@ -1,0 +1,6 @@
+@Medicare_backend_HostAddress = http://localhost:5057
+
+GET {{Medicare_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
