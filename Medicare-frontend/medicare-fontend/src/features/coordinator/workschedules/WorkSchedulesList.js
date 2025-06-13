@@ -53,7 +53,8 @@ const WorkSchedulesList = () => {
 
   // API operations
   const apiRequest = async (url, method, data = null) => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('token');
+    console.log('Token gửi lên:', token);
     const config = {
       method,
       headers: {
@@ -61,9 +62,8 @@ const WorkSchedulesList = () => {
         ...(token && { 'Authorization': `Bearer ${token}` })
       }
     };
-    
     if (data) config.body = JSON.stringify(data);
-    
+
     const response = await fetch(url, config);
     if (!response.ok) {
       const errorMessages = {
@@ -73,7 +73,7 @@ const WorkSchedulesList = () => {
       };
       throw new Error(errorMessages[response.status] || 'Có lỗi xảy ra. Vui lòng thử lại sau.');
     }
-    
+
     return method !== 'DELETE' ? response.json() : null;
   };
 
@@ -351,7 +351,7 @@ const WorkSchedulesList = () => {
       />
 
       <ErrorModal
-        open={showErrorModal}
+        isOpen={showErrorModal}
         message={errorMessage}
         onClose={() => setShowErrorModal(false)}
       />
