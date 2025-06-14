@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import '../../../style/ServicesForm.css';
+import { GetSpecialtiesAsync, GetDoctorsAsync } from '../../../api/ServicesDropdownApi';
 
-const ConfirmModal = ({ open, title, message, onConfirm, onCancel }) => {
-  if (!open) return null;
+const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, iconType }) => {
+  if (!isOpen) return null;
   return (
     <div className="confirm-modal-overlay">
       <div className="confirm-modal">
-        <div className="confirm-modal-header">
+        <div className="confirm-modalheader">
           <h3 className="modal-title">{title}</h3>
-          <button className="close-btn" onClick={onCancel} aria-label="Close">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
+          <button className="close-btn" onClick={onCancel} aria-label="Close">×</button>
         </div>
         <div className="confirm-modal-body">
           <div className="confirm-modal-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1D479A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-              <line x1="12" y1="17" x2="12" y2="17" />
-            </svg>
+            {iconType === 'warning' && (
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1D479A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12" y2="16" />
+              </svg>
+            )}
           </div>
           <p className="modal-message">{message}</p>
         </div>
@@ -36,10 +34,10 @@ const ConfirmModal = ({ open, title, message, onConfirm, onCancel }) => {
 
 const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    department: '',
-    doctor: '',
-    price: '',
+    serviceName: '',
+    specialtyId: '',
+    doctorId: '',
+    cost: '',
     duration: '',
     description: '',
     image: null,
@@ -47,15 +45,41 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
   });
   const [errors, setErrors] = useState({});
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [specialties, setSpecialties] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [allDoctors, setAllDoctors] = useState([]);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
+  // Lấy dữ liệu chuyên khoa và bác sĩ khi component được tạo
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const specialtiesResponse = await GetSpecialtiesAsync();
+        setSpecialties(specialtiesResponse.data || []);
+        console.log('Từng chuyên khoa:', specialtiesResponse.data);
+      } catch (error) {
+        console.error('Error fetching specialties:', error);
+        setSpecialties([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Thiết lập dữ liệu khi chỉnh sửa dịch vụ
   useEffect(() => {
     if (editingService) {
       setFormData({
-        name: editingService.name || '',
-        department: editingService.department || '',
-        doctor: editingService.doctor || '',
-        price: editingService.price ? editingService.price.replace(/\D/g, '') : '',
-        duration: editingService.duration ? editingService.duration.replace(/\D/g, '') : '',
+        serviceName: editingService.serviceName || editingService.name || '',
+        name: editingService.name || editingService.serviceName || '',
+        specialtyId: editingService.specialtyId || '',
+        doctorId: editingService.doctorId || '',
+        cost: editingService.cost ? editingService.cost.toString().replace(/\D/g, '') : '',
+        duration: editingService.duration ? editingService.duration.toString() : '',
         description: editingService.description || '',
         image: editingService.image || null,
         imageName: editingService.imageName || null
@@ -63,18 +87,23 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
     }
   }, [editingService]);
 
+  // Định dạng giá tiền
   const formatPrice = (value) => {
     if (!value) return '';
     const number = value.replace(/\D/g, '');
     return number.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
+  // Xử lý thay đổi input
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'price') {
-      setFormData(prev => ({ ...prev, [name]: formatPrice(value) }));
+    if (name === 'cost') {
+      // Chỉ cho phép nhập số, loại bỏ ký tự không phải số
+      const numericValue = value.replace(/[^0-9]/g, '');
+      // Format lại dấu phẩy phần nghìn
+      const formatted = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      setFormData(prev => ({ ...prev, [name]: formatted }));
     } else if (name === 'duration') {
-      // Chỉ cho nhập số
       const numericValue = value.replace(/\D/g, '');
       setFormData(prev => ({ ...prev, [name]: numericValue }));
     } else {
@@ -85,6 +114,7 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
     }
   };
 
+  // Xử lý upload ảnh
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -93,11 +123,12 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
         setErrors(prev => ({ ...prev, image: 'Chỉ chấp nhận file PNG, JPG, JPEG hoặc GIF' }));
         return;
       }
-      const maxSize = 5 * 1024 * 1024;
+      const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
         setErrors(prev => ({ ...prev, image: 'Kích thước file không được vượt quá 5MB' }));
         return;
       }
+
       const reader = new FileReader();
       reader.onload = (event) => {
         setFormData(prev => ({ ...prev, image: event.target.result, imageName: file.name }));
@@ -107,41 +138,160 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
     }
   };
 
+  // Xử lý xóa ảnh
   const handleRemoveImage = () => {
     setFormData(prev => ({ ...prev, image: null, imageName: null }));
   };
 
+  // Kiểm tra tính hợp lệ của form
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Tên dịch vụ khám là bắt buộc';
-    if (!formData.department) newErrors.department = 'Chuyên khoa là bắt buộc';
-    if (!formData.doctor) newErrors.doctor = 'Bác sĩ phụ trách là bắt buộc';
-    if (!formData.price.trim()) newErrors.price = 'Chi phí dịch vụ là bắt buộc';
-    else {
-      const priceNumber = parseInt(formData.price.replace(/,/g, ''));
-      if (isNaN(priceNumber) || priceNumber <= 0) newErrors.price = 'Chi phí phải là số dương hợp lệ';
+
+    // Tên dịch vụ khám
+    if (!((formData.serviceName || formData.name || '').toString().trim())) {
+      newErrors.name = 'Tên dịch vụ khám là bắt buộc';
     }
-    if (!formData.duration.trim()) newErrors.duration = 'Thời gian thực hiện là bắt buộc';
-    else {
+
+    // Chuyên khoa (specialtyId là số hoặc chuỗi số)
+    if (formData.specialtyId === undefined || formData.specialtyId === null || formData.specialtyId === '' || isNaN(Number(formData.specialtyId))) {
+      newErrors.specialtyId = 'Chuyên khoa là bắt buộc';
+    }
+
+    // Bác sĩ (doctorId là số hoặc chuỗi số)
+    if (formData.doctorId === undefined || formData.doctorId === null || formData.doctorId === '' || isNaN(Number(formData.doctorId))) {
+      newErrors.doctorId = 'Bác sĩ là bắt buộc';
+    }
+
+    // Chi phí
+    if (!((formData.cost || '').toString().trim())) {
+      newErrors.cost = 'Chi phí dịch vụ là bắt buộc';
+    } else {
+      const costNumber = parseInt((formData.cost || '').toString().replace(/,/g, ''));
+      if (isNaN(costNumber) || costNumber <= 0) {
+        newErrors.cost = 'Chi phí phải là số dương hợp lệ';
+      }
+    }
+
+    // Thời gian thực hiện
+    if (!((formData.duration || '').toString().trim())) {
+      newErrors.duration = 'Thời gian thực hiện là bắt buộc';
+    } else {
       const durationNumber = parseInt(formData.duration);
-      if (isNaN(durationNumber) || durationNumber < 15 || durationNumber > 120) newErrors.duration = 'Thời gian phải từ 15 đến 120 phút';
+      if (isNaN(durationNumber) || durationNumber < 15 || durationNumber > 120) {
+        newErrors.duration = 'Thời gian phải từ 15 đến 120 phút';
+      }
     }
-    if (formData.description && formData.description.length > 500) newErrors.description = 'Mô tả không được vượt quá 500 ký tự';
+
+    // Mô tả
+    if ((formData.description || '').length > 500) {
+      newErrors.description = 'Mô tả không được vượt quá 500 ký tự';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  // Xử lý submit form
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      onSubmit({ ...formData, price: formData.price, duration: formData.duration });
+    try {
+      // Validate form trước khi gửi
+      if (!validateForm()) {
+        console.log('Form validation failed:', errors);
+        return;
+      }
+
+      // Tạo object dữ liệu gửi lên server
+      const submissionData = {
+        serviceId: editingService?.serviceId,
+        serviceName: formData.serviceName || formData.name || '',
+        description: formData.description || '',
+        cost: parseInt(formData.cost.replace(/,/g, '')),
+        duration: parseInt(formData.duration),
+        doctorId: parseInt(formData.doctorId),
+        specialtyId: parseInt(formData.specialtyId),
+        image: formData.image || null
+      };
+
+      console.log('Dữ liệu gửi đi:', submissionData);
+
+      // Sử dụng prop onSubmit đã được truyền vào
+      await onSubmit(submissionData);
+      onClose();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      if (error.response?.data?.errors) {
+        const validationErrors = error.response.data.errors;
+        console.error("Validation errors:", validationErrors);
+      }
     }
   };
 
+  // Xử lý hủy form
   const handleCancel = (e) => {
     e.preventDefault();
     setShowCancelModal(true);
   };
+
+  useEffect(() => {
+    const fetchAllDoctors = async () => {
+      try {
+        const doctorsResponse = await GetDoctorsAsync();
+        console.log('Từng bác sĩ:', doctorsResponse.data);
+        setAllDoctors(doctorsResponse.data || []);
+        if (allDoctors.length > 0) {
+          console.log('Bác sĩ mẫu:', allDoctors[0]);
+        }
+      } catch (error) {
+        setAllDoctors([]);
+      }
+    };
+    fetchAllDoctors();
+  }, []);
+
+  useEffect(() => {
+    if (formData.specialtyId) {
+      const selectedSpecialty = specialties.find(
+        (s) => String(s.specialtyId) === String(formData.specialtyId)
+      );
+      const specialtyName = selectedSpecialty ? selectedSpecialty.specialtyName : "";
+      console.log('specialtyName được chọn:', specialtyName);
+      const filtered = allDoctors.filter((doctor) => {
+        if (doctor.specialtyName) {
+          return (doctor.specialtyName || "") === (specialtyName || "");
+        }
+        if (doctor.specialty && doctor.specialty.specialtyName) {
+          return (doctor.specialty.specialtyName || "") === (specialtyName || "");
+        }
+        if (doctor.specialtyId) {
+          return String(doctor.specialtyId) === String(formData.specialtyId);
+        }
+        return false;
+      });
+      console.log('Bác sĩ theo chuyên khoa:', filtered);
+      setDoctors(filtered);
+    } else {
+      setDoctors(allDoctors);
+    }
+  }, [formData.specialtyId, allDoctors, specialties]);
+
+  useEffect(() => {
+    if (editingService && specialties.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        specialtyId: String(editingService.specialtyId),
+      }));
+    }
+  }, [specialties, editingService]);
+
+  useEffect(() => {
+    if (editingService && doctors.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        doctorId: String(editingService.doctorId),
+      }));
+    }
+  }, [doctors, editingService]);
 
   return (
     <>
@@ -149,21 +299,24 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
         <div className="modal-container">
           <div className="modal-header">
             <h2>{editingService ? 'SỬA DỊCH VỤ KHÁM' : 'THÊM DỊCH VỤ KHÁM'}</h2>
-            <button className="close-btn" onClick={onClose}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
+            <button className="close-btn" onClick={() => setShowCancelModal(true)}>×</button>
           </div>
+
           <form className="services-form" onSubmit={handleSubmit}>
+            {loading && (
+              <div className="loading-indicator">
+                <div className="loading-spinner"></div>
+                <p>Đang tải dữ liệu...</p>
+              </div>
+            )}
+            
             <div className="form-group">
-              <label htmlFor="name">Tên dịch vụ khám: <span className="required">*</span></label>
+              <label htmlFor="serviceName">Tên dịch vụ khám: <span className="required">*</span></label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+                id="serviceName"
+                name="serviceName"
+                value={formData.serviceName || formData.name || ""}
                 onChange={handleInputChange}
                 className={errors.name ? 'error' : ''}
                 placeholder="Ví dụ: Khám da liễu"
@@ -171,56 +324,61 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
               />
               {errors.name && <span className="error-message">{errors.name}</span>}
             </div>
+            
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="department">Chuyên khoa: <span className="required">*</span></label>
+                <label htmlFor="specialtyId">Chuyên khoa: <span className="required">*</span></label>
                 <select
-                  id="department"
-                  name="department"
-                  value={formData.department}
+                  id="specialtyId"
+                  name="specialtyId"
+                  value={formData.specialtyId}
                   onChange={handleInputChange}
-                  className={errors.department ? 'error' : ''}
+                  className={errors.specialtyId ? 'error' : ''}
+                  disabled={loading}
                 >
                   <option value="">-- Chọn chuyên khoa --</option>
-                  <option value="Da liễu">Da liễu</option>
-                  <option value="Hô Hấp">Hô Hấp</option>
-                  <option value="Nội tổng quát">Nội tổng quát</option>
-                  <option value="Tim mạch">Tim mạch</option>
+                  {specialties.map((spec) => (
+                    <option key={spec.specialtyId || spec.id} value={spec.specialtyId || spec.id}>
+                      {spec.specialtyName || spec.name}
+                    </option>
+                  ))}
                 </select>
-                {errors.department && <span className="error-message">{errors.department}</span>}
+                {errors.specialtyId && <span className="error-message">{errors.specialtyId}</span>}
               </div>
               <div className="form-group">
-                <label htmlFor="doctor">Bác sĩ phụ trách: <span className="required">*</span></label>
+                <label htmlFor="doctorId">Bác sĩ phụ trách: <span className="required">*</span></label>
                 <select
-                  id="doctor"
-                  name="doctor"
-                  value={formData.doctor}
+                  id="doctorId"
+                  name="doctorId"
+                  value={formData.doctorId || ""}
                   onChange={handleInputChange}
-                  className={errors.doctor ? 'error' : ''}
+                  className={errors.doctorId ? 'error' : ''}
                 >
-                  <option value="">-- Chọn bác sĩ --</option>
-                  <option value="BS.Nguyễn Quang Hiếu">BS.Nguyễn Quang Hiếu</option>
-                  <option value="BS.Đỗ Thị Hiền Lương">BS.Đỗ Thị Hiền Lương</option>
-                  <option value="BS.Trần Văn A">BS.Trần Văn A</option>
+                  <option key="default" value="">Chọn bác sĩ</option>
+                  {doctors.map((doctor) => (
+                    <option key={doctor.doctorId} value={doctor.doctorId}>
+                      {doctor.fullName}
+                    </option>
+                  ))}
                 </select>
-                {errors.doctor && <span className="error-message">{errors.doctor}</span>}
+                {errors.doctorId && <span className="error-message">{errors.doctorId}</span>}
               </div>
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="price">Chi phí dịch vụ (VND): <span className="required">*</span></label>
+                <label htmlFor="cost">Chi phí dịch vụ (VND): <span className="required">*</span></label>
                 <input
                   type="text"
-                  id="price"
-                  name="price"
-                  value={formData.price}
+                  id="cost"
+                  name="cost"
+                  value={formData.cost || ""}
                   onChange={handleInputChange}
-                  className={errors.price ? 'error' : ''}
-                  placeholder="Ví dụ: 500,000"
+                  className={errors.cost ? 'error' : ''}
+                  placeholder="Ví dụ: 200,000"
                   autoComplete="off"
                   inputMode="numeric"
                 />
-                {errors.price && <span className="error-message">{errors.price}</span>}
+                {errors.cost && <span className="error-message">{errors.cost}</span>}
               </div>
               <div className="form-group">
                 <label htmlFor="duration">Thời gian thực hiện (phút): <span className="required">*</span></label>
@@ -259,6 +417,9 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
                   <div className="image-preview-section">
                     <img src={formData.image} alt="preview" className="preview-image" />
                     <div className="change-placeholder">Thay đổi ảnh minh họa<br/>PNG, JPG, GIF</div>
+                    <label htmlFor="image-upload-input" className="change-image-btn" style={{ cursor: 'pointer', color: '#1D479A', textDecoration: 'underline', marginTop: 8, display: 'inline-block' }}>
+                      Chọn lại ảnh
+                    </label>
                   </div>
                 ) : (
                   <label htmlFor="image-upload-input" className="upload-placeholder" style={{ cursor: 'pointer' }}>
@@ -276,10 +437,10 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
                 />
               </div>
               {formData.imageName && (
-                <div className="file-info success">
-                  <svg width="18" height="18" fill="#38A169" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" /></svg>
-                  {formData.imageName}
-                  <button type="button" className="remove-file-btn" onClick={handleRemoveImage}>&times;</button>
+                <div className="file-info success" style={{background: '#e6f9f0', color: '#222', display: 'flex', alignItems: 'center', borderRadius: 8, padding: '8px 12px', marginTop: 8, boxShadow: '0 0 4px #0db52022'}}>
+                  <i className="fa-regular fa-image" style={{color: '#0db520', fontSize: 20, marginRight: 8}}></i>
+                  <span style={{flex: 1}}>{formData.imageName}</span>
+                  <button type="button" className="remove-file-btn" style={{color: '#e74c3c', fontSize: 22, background: 'none', border: 'none', cursor: 'pointer'}} onClick={handleRemoveImage}>&times;</button>
                 </div>
               )}
               {errors.image && <span className="error-message">{errors.image}</span>}
@@ -291,13 +452,20 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
           </form>
         </div>
       </div>
-      <ConfirmModal
-        open={showCancelModal}
-        title="XÁC NHẬN THOÁT"
-        message={editingService ? "Bạn có muốn thoát khỏi chức năng sửa dịch vụ không?" : "Bạn có muốn thoát khỏi chức năng thêm dịch vụ không?"}
+      <ConfirmModal 
+        isOpen={showCancelModal}
+        title="Xác nhận thoát"
+        message="Bạn có muốn thoát khỏi chức năng thêm/sửa dịch vụ không?"
         onConfirm={onClose}
         onCancel={() => setShowCancelModal(false)}
+        iconType={undefined}
       />
+      {showSuccessMessage && (
+        <div className="success-toast">
+          <div className="success-icon">✔</div>
+          <div>Sửa dịch vụ khám thành công</div>
+        </div>
+      )}
     </>
   );
 };
