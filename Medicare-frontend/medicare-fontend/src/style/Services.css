@@ -262,9 +262,9 @@
   transform: translate(-50%, -50%);
   background: #EEF7ED;
   color: #222;
-  border-radius: 12px;
-  padding: 32px 40px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  border-radius: 18px;
+  padding: 36px 48px;
+  /* box-shadow: 0 4px 24px rgba(0,0,0,0.12); */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -273,20 +273,24 @@
   font-weight: 400;
   animation: fadeIn 0.3s;
   text-transform: none;
+  min-width: 340px;
+  min-height: 120px;
+  border: none;
 }
 .success-icon-bg {
-  background: #32D53B;
+  background: #32D53B; /* Màu xanh lá cây */
   border-radius: 50%;
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
-.success-icon-bg i {
+
+.success-icon-bg svg {
   color: #fff;
-  font-size: 36px;
+  font-size: 38px;
 }
 @keyframes fadeIn {
   from { opacity: 0; transform: translate(-50%, -60%);}

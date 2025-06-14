@@ -90,16 +90,27 @@ const ServicesList = () => {
     const serviceName = service?.service_name || service?.serviceName || service?.name || '';
     const specialtyName = getSpecialtyNameById(service.specialtyId);
     const doctorName = getDoctorNameById(service.doctorId || service.doctor_id);
-    
-    const matchesSearch = serviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         specialtyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         doctorName.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const cost = service?.cost ? String(service.cost) : '';
+    const duration = service?.duration ? String(service.duration) : '';
+    const search = searchTerm.trim().toLowerCase();
+
+    let matchesSearch = false;
+    if (!search) {
+      matchesSearch = true;
+    } else if (!isNaN(Number(search))) {
+      // Nếu là số, tìm theo giá tiền hoặc thời gian
+      matchesSearch = cost.includes(search) || duration.includes(search);
+    } else {
+      matchesSearch =
+        serviceName.toLowerCase().includes(search) ||
+        specialtyName.toLowerCase().includes(search) ||
+        doctorName.toLowerCase().includes(search);
+    }
+
     const matchesFilter = 
       filterStatus === 'all' ? true :
       filterStatus === 'active' ? (service?.isActive !== false) :
       filterStatus === 'inactive' ? (service?.isActive === false) : true;
-    
     return matchesSearch && matchesFilter;
   });
 
@@ -124,12 +135,7 @@ const ServicesList = () => {
       // Add new service to the beginning of the list
       setServices(prev => [response.data, ...prev]);
       setShowSuccessMessage(true);
-      setSuccessMessageText(
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <FontAwesomeIcon icon="fa-solid fa-circle-check" style={{ color: "#11bb14", fontSize: 48, marginBottom: 12 }} />
-          <span>Thêm dịch vụ khám thành công!</span>
-        </div>
-      );
+      setSuccessMessageText('Thêm dịch vụ khám thành công!');
       setTimeout(() => setShowSuccessMessage(false), 2500);
     } catch (error) {
       console.error('❌ Error adding service:', error);
@@ -244,11 +250,22 @@ const ServicesList = () => {
     <div className="services-list-container">
       {/* Success message */}
       {showSuccessMessage && (
-        <div className="centered-success-toast">
-          {successMessageText}
+        <div className="success-toast">
+          {typeof successMessageText === 'string' ? (
+            <>
+              <div className="success-icon-bg">
+                <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+                  <circle cx="19" cy="19" r="19" fill="#32D53B"/>
+                  <path d="M11 20.5L17 26.5L27 14.5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <span>{successMessageText}</span>
+            </>
+          ) : (
+            successMessageText
+          )}
         </div>
       )}
-
       <div className="services-filter-card-full">
         <div className="services-filter-group-left">
           <label htmlFor="status-filter">Trạng thái:</label>
