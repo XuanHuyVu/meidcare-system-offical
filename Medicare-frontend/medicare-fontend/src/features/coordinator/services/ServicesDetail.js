@@ -28,7 +28,7 @@ const ServicesDetail = ({ service, onClose, doctors = [], specialties = [] }) =>
 
   return (
     <div className="services-detail-overlay" style={{background: 'rgba(0,0,0,0.4)', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 1000}} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="services-detail-container" style={{boxShadow: '0 0 10px rgba(0,0,0,0.25)', border: 'none', margin: '40px auto', borderRadius: 12, padding: 24, maxHeight: '80vh', overflowY: 'auto', width: '95%'}}>
+      <div className="services-detail-container" style={{boxShadow: '0 0 10px rgba(0,0,0,0.25)', border: 'none', margin: '40px auto', borderRadius: 14, padding: 32, maxHeight: '80vh', overflowY: 'auto', width: '600px', maxWidth: '95vw'}}>
         <div className="services-detail-header">
           <span>{(service.service_name || service.serviceName || '').toUpperCase()}</span>
           <button className="close-btn" onClick={onClose}>×</button>

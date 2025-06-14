@@ -157,9 +157,10 @@
 }
 
 .service-image {
-  width: 180px;
-  height: auto;
-  border-radius: 6px;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
   box-shadow: 0 0 8px rgba(29, 71, 154, 0.15);
 }
 
