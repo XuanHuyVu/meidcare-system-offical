@@ -1,4 +1,4 @@
-/* Container tổng */
+Container tổng
 .appointment-list-container {
     display: flex;
     flex-direction: column;
@@ -40,11 +40,10 @@
   
   /* Bộ lọc */
   .filter-section {
-    margin-bottom: 20px;
     display: flex;
-    justify-content: flex-start;
     align-items: center;
-    gap: 10px;
+    gap: 24px;
+    margin-bottom: 18px;
   }
   
   .filter-checkbox-container {
@@ -60,7 +59,7 @@
   .filter-checkbox-group {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
   }
   
   /* Thanh tìm kiếm */
@@ -122,38 +121,55 @@
     background-color: #f5f5f5;
   }
   
-  /* Hành động */
-  .action-buttons {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .edit-btn,
-  .delete-btn {
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 14px;
-    border: none;
-    color: white;
-  }
-  
-  .edit-btn {
-    background-color: #2196F3;
-  }
-  
-  .edit-btn:hover {
-    background-color: #1976D2;
-  }
-  
-  .delete-btn {
-    background-color: #f44336;
-  }
-  
-  .delete-btn:hover {
-    background-color: #d32f2f;
-  }
+/*Button*/
+.actionbutton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: 100%;
+}
+
+.actionbutton button,
+.actionbutton .edit-btn {
+  background: #f5f7fa;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.actionbutton button:hover,
+.actionbutton .edit-btn:hover {
+  background: #e0e6ed;
+  transform: translateY(-1px);
+}
+
+.actionbutton .fa-edit {
+  color: #F6C343;
+  font-size: 18px;
+}
+
+.actionbutton .fas fa-trash {
+  color: #E74C3C;
+  font-size: 18px;
+}
+
+.icon-trash {
+  color: red !important;
+}
+
+
+.actionbutton .fa-info-circle {
+  color: #1e429f !important;
+  font-size: 18px;
+}
   
   /* Trạng thái */
   .loading,
@@ -176,11 +192,17 @@
   
 /* Bộ lọc và thanh tìm kiếm */
   .filter-section {
+    width: 100%;
+    max-width: 100%;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(29,71,154,0.07);
+    padding: 5px 5px 8px 8px;
+    margin: 0 0 16px 0;
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
   }
   
   .filter-checkbox-group {
@@ -208,4 +230,55 @@
     border: 1px solid #ccc;
     font-size: 14px;
   }
+
+  
+  .add-appointment-button {
+    margin-bottom: 10px;
+    text-align: left;
+  }
+  
+  .add-appointment-button button {
+    background-color: #1e429f;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+  }
+  
+  .add-appointment-button button:hover {
+    background-color: #153e7e;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-appointment-button button:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+  
+  .filter-select {
+    padding: 7px 16px;
+    border: 1.5px solid #1D479A;
+    border-radius: 6px;
+    font-size: 15px;
+    color: #1D479A;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-left: 6px;
+  }
+
+  .filter-select:focus {
+    border-color: #153c7c;
+  }
+
+  .filter-select option {
+    color: #222;
+  }
+  
   

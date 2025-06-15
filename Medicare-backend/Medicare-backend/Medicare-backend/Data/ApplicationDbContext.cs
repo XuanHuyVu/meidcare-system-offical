@@ -25,7 +25,7 @@ namespace Medicare_backend.Data
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Patient> Patients { get; set; }
-        public DbSet<Appointment> Appointments { get; set; }    
+        public DbSet<Appointment> Appointments { get; set; }
         public DbSet<WorkSchedule> WorkSchedules { get; set; }
         public DbSet<User> Users { get; set; }
     }

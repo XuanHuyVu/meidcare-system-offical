@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Tạo một instance dùng sẵn
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:7130/api',
+  baseURL: 'http://localhost:7130',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -42,5 +42,15 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export const createAppointment = async (appointmentData) => {
+  try {
+    const response = await axiosInstance.post('/appointments', appointmentData);
+    return response.data; // Return the response data (e.g., success message)
+  } catch (error) {
+    console.error('Error creating appointment:', error);
+    throw error; // Rethrow the error to handle it in the caller
+  }
+};
 
 export default axiosInstance;

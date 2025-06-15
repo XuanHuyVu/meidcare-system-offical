@@ -7,6 +7,7 @@ import '../style/Layout.css';
 import Dashboard from '../features/coordinator/dashboard/Dashboard';
 import ServicesList from '../features/coordinator/services/ServicesList';
 import WorkSchedulesList from '../features/coordinator/workschedules/WorkSchedulesList';
+import AppointmentList from '../features/coordinator/appoinments/AppointmentList';
 
 function AppLayout() {
   const location = useLocation();
@@ -21,6 +22,7 @@ function AppLayout() {
             <Route path="/*" element={<Dashboard />} />
             <Route path="/workschedules" element={<WorkSchedulesList />} />
             <Route path="/services" element={<ServicesList />} />
+            <Route path="/appointments" element={<AppointmentList />} />
           </Routes>
         </div>
         {location.pathname !== '/' && <Footer />}

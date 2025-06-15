@@ -4,6 +4,8 @@ using Medicare_backend.Models;
 using Medicare_backend.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
+using System.Linq;
 
 namespace Medicare_backend.Services
 {
@@ -21,8 +23,20 @@ namespace Medicare_backend.Services
 
         public async Task<IEnumerable<AppointmentDto>> GetAllAsync()
         {
-            var appointments = await _appointmentRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<AppointmentDto>>(appointments);
+            try
+            {
+                var appointments = await _appointmentRepository.GetAllAsync();
+                if (appointments == null || !appointments.Any())
+                {
+                    return new List<AppointmentDto>();
+                }
+                return _mapper.Map<IEnumerable<AppointmentDto>>(appointments);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi ở đây
+                throw new Exception($"Lỗi khi lấy danh sách lịch hẹn: {ex.Message}", ex);
+            }
         }
         public async Task<AppointmentDto?> GetByIdAsync(int id)
         {

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using System;
 
 namespace Medicare_backend.Controllers.Coordinator
 {
@@ -21,8 +21,15 @@ namespace Medicare_backend.Controllers.Coordinator
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetAll()
         {
-            var appointments = await _appointmentService.GetAllAsync();
-            return Ok(appointments);
+            try
+            {
+                var appointments = await _appointmentService.GetAllAsync();
+                return Ok(appointments);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Lỗi khi lấy danh sách lịch hẹn: {ex.Message}" });
+            }
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<AppointmentDto>> GetById(int id)
@@ -46,7 +53,7 @@ namespace Medicare_backend.Controllers.Coordinator
         [HttpGet("clinic/{clinicId}")]
         public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetByClinicId(int clinicId)
         {
-            var appointments = await _appointmentService.GetByClinicIdAsync(clinicId);
+            var appointments = await _appointmentService.GetByClinicIdAsync(clinicId); 
             return Ok(appointments);
         }
         [HttpPost]

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace Medicare_backend.Repositories
 {
@@ -16,12 +17,21 @@ namespace Medicare_backend.Repositories
         }
         public async Task<IEnumerable<Appointment>> GetAllAsync()
         {
-            return await _context.Appointments
-                .Include(a => a.Patient)
-                .Include(a => a.Doctor)
-                .Include(a => a.Service).ThenInclude(s => s.Specialty)
-                .Include(a => a.Clinic)
-                .ToListAsync();
+            try
+            {
+                return await _context.Appointments
+                    .Include(a => a.Patient)
+                    .Include(a => a.Doctor)
+                    .Include(a => a.Service)
+                        .ThenInclude(s => s.Specialty)
+                    .Include(a => a.Clinic)
+                    .AsNoTracking()
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi khi lấy danh sách lịch hẹn: {ex.Message}", ex);
+            }
         }
         public async Task<Appointment?> GetByIdAsync(int id)
         {
