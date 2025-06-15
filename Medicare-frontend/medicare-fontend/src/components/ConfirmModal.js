@@ -17,16 +17,15 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, iconType })
           </button>
         </div>
         <div className="confirm-modal-body">
-          <div className="confirm-modal-icon">
-            {iconType === 'warning' ? (
-              <img src="/tamgiacvang.png" alt="warning" style={{width: '48px'}} />
-            ) : (
-              <svg width="32" height="32" viewBox="0 0 32 32">
-                <circle cx="16" cy="16" r="16" fill="#1D479A"/>
-                <text x="16" y="22" textAnchor="middle" fontSize="20" fontWeight="bold" fill="#fff">?</text>
+          {iconType === 'warning' && (
+            <div className="confirm-modal-icon">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                <circle cx="20" cy="20" r="20" fill="#fff3cd" />
+                <path d="M20 10L34 34H6L20 10Z" fill="#f39c12" />
+                <text x="20" y="30" textAnchor="middle" fontSize="22" fontWeight="bold" fill="#fff">!</text>
               </svg>
-            )}
-          </div>
+            </div>
+          )}
           <p className="modal-message">{message}</p>
         </div>
         <div className="modal-actions">

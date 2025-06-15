@@ -373,3 +373,27 @@
   color: #fff;
   border-color: #007bff;
 }
+
+/* In your Services.css or a relevant global CSS file */
+.services-search-group-right {
+  position: relative; /* To position the icon absolutely within this container */
+  display: flex; /* Align items nicely if needed */
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px; /* Adjust as needed */
+  color: #aaa; /* Adjust color as needed */
+  pointer-events: none; /* To allow clicking through the icon to the input */
+}
+
+.search-input {
+  padding-left: 35px !important; /* Ensure text doesn't overlap icon. Adjust as needed. Use !important if necessary to override other styles */
+  /* Add other existing styles for search-input */
+}
+
+/* Ưu tiên căn trái cho ô có class text-left */
+.services-table td.text-left {
+  text-align: left !important;
+}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faInfoCircle, faEdit, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons';
 import '../../../style/Services.css';
 import { GetAllAsync, CreateAsync, UpdateAsync, DeleteAsync } from '../../../api/ServicesApi';
 import { GetDoctorsAsync, GetSpecialtiesAsync } from '../../../api/ServicesDropdownApi';
@@ -281,13 +281,16 @@ const ServicesList = () => {
           </select>
         </div>
         <div className="services-search-group-right">
+          <FontAwesomeIcon icon={faSearch} className="search-icon" />
           <input
             type="text"
             placeholder="Tìm kiếm dịch vụ khám"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
+            style={{ paddingLeft: '30px' }}
           />
+          <FontAwesomeIcon icon={faSearch} className="search-icon" />
         </div>
       </div>
       <div className="add-service-btn-row-full">
@@ -312,12 +315,16 @@ const ServicesList = () => {
             {pagedServices.length > 0 ? (
               pagedServices.map((service, index) => (
                 <tr key={`${service.service_id || service.serviceId || 'row'}-${index}`}>
-                  <td>{index + 1}</td>
-                  <td>{service.serviceName || service.serviceName || 'N/A'}</td>
-                  <td>{getSpecialtyNameById(service.specialtyId)}</td>
-                  <td>{getDoctorNameById(service.doctorId || service.doctor_id)}</td>
-                  <td>{service.cost ? service.cost.toLocaleString('vi-VN') + ' đ' : 'N/A'}</td>
-                  <td>{service.duration ? service.duration + ' phút' : 'N/A'}</td>
+                  <td >{index + 1}</td>
+                  <td className="text-left" >{service.serviceName || 'N/A'}</td>
+                  <td className="text-left" >{getSpecialtyNameById(service.specialtyId)}</td>
+                  <td className="text-left">{getDoctorNameById(service.doctorId || service.doctor_id)}</td>
+                  <td className="text-left">
+                    {service.cost ? service.cost.toLocaleString('vi-VN') + ' đ' : 'N/A'}
+                  </td>
+                  <td className="text-left">
+                    {service.duration ? service.duration + ' phút' : 'N/A'}
+                  </td>
                   <td>
                     <div className="action-buttons">
                       <button 
@@ -398,6 +405,7 @@ const ServicesList = () => {
 
       {showAddForm && <ServicesForm onClose={() => setShowAddForm(false)} onSubmit={handleAddService} />}
       {showEditForm && <ServicesForm onClose={() => setShowEditForm(false)} editingService={editingService} onSubmit={handleEditServiceSubmit} />}
+      
       <ConfirmModal 
         isOpen={showDeleteModal}
         title="Xác nhận xóa"
