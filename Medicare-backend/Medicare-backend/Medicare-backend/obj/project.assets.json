@@ -5082,24 +5082,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\QUANG HIEU\\.nuget\\packages\\": {},
+    "C:\\Users\\Admin\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\CacVandeTienTien\\MediCare\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj",
+      "projectUniqueName": "D:\\review\\Medicare\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj",
       "projectName": "Medicare_backend",
-      "projectPath": "E:\\CacVandeTienTien\\MediCare\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj",
-      "packagesPath": "C:\\Users\\QUANG HIEU\\.nuget\\packages\\",
-      "outputPath": "E:\\CacVandeTienTien\\MediCare\\Medicare-backend\\Medicare-backend\\Medicare-backend\\obj\\",
+      "projectPath": "D:\\review\\Medicare\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj",
+      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+      "outputPath": "D:\\review\\Medicare\\Medicare-backend\\Medicare-backend\\Medicare-backend\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "E:\\CacVandeTienTien\\MediCare\\Medicare-backend\\Medicare-backend\\NuGet.Config",
-        "C:\\Users\\QUANG HIEU\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "D:\\review\\Medicare\\Medicare-backend\\Medicare-backend\\NuGet.Config",
+        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -5126,7 +5126,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net8.0": {
@@ -5186,7 +5186,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

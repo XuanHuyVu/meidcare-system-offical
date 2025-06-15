@@ -1,1 +1,10 @@
 .vs/
+# Ignore bin and obj directories
+/bin/
+/obj/
+/bin/Debug/
+/obj/Debug/
+*.dll
+*.exe
+*.pdb
+*.json
