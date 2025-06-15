@@ -11,6 +11,7 @@ import "../../../style/AppointmentList.css";
 import dayjs from "dayjs";
 import { FaInfoCircle, FaEdit, FaTrash } from "react-icons/fa";
 
+
 const AppointmentList = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +28,12 @@ const AppointmentList = () => {
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [appointmentToDelete, setAppointmentToDelete] = useState(null);
+
+// Pagination state
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const [pageSize, setPageSize] = useState(10); // Số lượng bản ghi mỗi trang
+  const [totalRecords, setTotalRecords] = useState(0); // Tổng số bản ghi
+  const [totalPages, setTotalPages] = useState(0); // Tổng số trang
 
   useEffect(() => {
     fetchAppointments();
@@ -127,6 +134,24 @@ const AppointmentList = () => {
     setShowConfirmModal(false); // Close confirmation modal without deleting
     setAppointmentToDelete(null); // Reset appointment ID
   };
+
+// Số bản ghi hiển thị
+const startIndex = (currentPage - 1) * pageSize; // Bắt đầu từ bản ghi nào
+const endIndex = Math.min(startIndex + pageSize, filteredAppointments.length); // Đảm bảo không vượt quá tổng số bản ghi
+
+const pagedAppointments = filteredAppointments.slice(startIndex, endIndex); // Cắt ra các bản ghi cho trang hiện tại
+
+
+  const handlePageChange = (pageNumber) => {
+  setCurrentPage(pageNumber); // Cập nhật trang khi người dùng chọn trang
+};
+
+const handlePageSizeChange = (e) => {
+  setPageSize(Number(e.target.value)); // Thay đổi số lượng bản ghi trên mỗi trang
+  setCurrentPage(1); // Reset về trang đầu khi thay đổi kích thước trang
+};
+
+
 
   return (
     <div className="appointment-list-container">
@@ -265,6 +290,48 @@ const AppointmentList = () => {
           </table>
         )}
       </div>
+
+          {/* Pagination */}
+    <div className="pagination-row">
+        <div className="pagination-info">
+        <span>Hiển thị <b>{filteredAppointments.length}</b> bản ghi</span>
+        </div>
+
+  <div className="pagination-controls">
+    <div className="page-size-selector">
+      <select value={pageSize} onChange={handlePageSizeChange}>
+        <option value={5}>5</option>
+        <option value={10}>10</option>
+        <option value={20}>20</option>
+        <option value={50}>50</option>
+      </select>
+    </div>
+            <button 
+          disabled={currentPage === 1} 
+          onClick={() => handlePageChange(currentPage - 1)} 
+          className="pagination-btn"
+        >
+          Trước
+        </button>
+        {[...Array(totalPages)].map((_, index) => (
+          <button 
+            key={index + 1} 
+            onClick={() => handlePageChange(index + 1)} 
+            className={`pagination-btn ${currentPage === index + 1 ? 'active' : ''}`}
+          >
+            {index + 1}
+          </button>
+        ))}
+        <button 
+          disabled={currentPage === totalPages} 
+          onClick={() => handlePageChange(currentPage + 1)} 
+          className="pagination-btn"
+        >
+          Sau
+        </button>
+  </div>    
+</div>
+
 
       {/* Confirmation modal for deleting */}
       <ConfirmModal
