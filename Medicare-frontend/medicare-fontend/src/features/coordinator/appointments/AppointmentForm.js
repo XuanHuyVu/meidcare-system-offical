@@ -8,7 +8,6 @@ import {
   GetServicesAsync,
   GetDoctorsAsync,
   GetClinicsAsync,
-  CheckPatientExistence,
   GetPatientsAsync,
 } from "../../../api/AppointmentDropdown";
 
@@ -21,6 +20,23 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
     patientName: "",
     clinicId: "",
   };
+
+  const [form, setForm] = useState(initialForm);
+  const [appointmentDate, setAppointmentDate] = useState(null);
+  const [appointmentTime, setAppointmentTime] = useState(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [specialties, setSpecialties] = useState([]);
+  const [services, setServices] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const [allDoctors, setAllDoctors] = useState([]);
+  const [clinics, setClinics] = useState([]);
+  const [isLoadingForm, setIsLoadingForm] = useState(false);
+  const [isLoadingServices, setIsLoadingServices] = useState(false);
+  const [isLoadingClinics, setIsLoadingClinics] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [patientExists, setPatientExists] = useState(true);
 
   // Xử lý khi chọn bệnh nhân và cập nhật thông tin bệnh nhân vào form
   const handlePatientChange = (e) => {
@@ -44,30 +60,12 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
     }
   };
 
-  const [form, setForm] = useState(initialForm);
-  const [appointmentDate, setAppointmentDate] = useState(null);
-  const [appointmentTime, setAppointmentTime] = useState(null);
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [specialties, setSpecialties] = useState([]);
-  const [services, setServices] = useState([]);
-  const [doctors, setDoctors] = useState([]);
-  const [patients, setPatients] = useState([]);
-  const [allDoctors, setAllDoctors] = useState([]);
-  const [clinics, setClinics] = useState([]);
-  const [isLoadingForm, setIsLoadingForm] = useState(false);
-  const [isLoadingServices, setIsLoadingServices] = useState(false);
-  const [isLoadingClinics, setIsLoadingClinics] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [patientExists, setPatientExists] = useState(true);
-
   // Hàm kiểm tra tính hợp lệ của form
   const validateForm = () => {
     let formErrors = {};
     let isValid = true;
 
     if (!form.patientId || !form.patientName) {
-      // Kiểm tra cả patientId và patientName
       formErrors.patientName = "Bệnh nhân là bắt buộc.";
       isValid = false;
     }
@@ -77,12 +75,12 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       isValid = false;
     }
 
-    if (!form.appointmentDate) {
+    if (!appointmentDate) {
       formErrors.appointmentDate = "Ngày khám là bắt buộc.";
       isValid = false;
     }
 
-    if (!form.appointmentTime) {
+    if (!appointmentTime) {
       formErrors.appointmentTime = "Giờ khám là bắt buộc.";
       isValid = false;
     }
@@ -105,85 +103,88 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       isValid = false;
     }
 
-    setErrors(formErrors); // Lưu lỗi vào state
+    setErrors(formErrors);
     return isValid;
   };
 
   // Load dữ liệu khi mở form
-  useEffect(() => {
-    if (!open) return;
+// useEffect để tải dữ liệu khi mở modal
+useEffect(() => {
+  if (!open) return;
 
-    const fetchDropdowns = async () => {
-      setIsLoadingForm(true);
-      setIsLoadingClinics(true);
-      try {
-        const [specialtiesRes, servicesRes, doctorsRes, clinicsRes] =
-          await Promise.all([
-            GetSpecialtiesAsync(),
-            GetServicesAsync(),
-            GetDoctorsAsync(),
-            GetClinicsAsync(),
-            GetPatientsAsync(), // Lấy danh sách bệnh nhân
-          ]);
-        setSpecialties(specialtiesRes.data || []);
-        setServices(servicesRes.data || []);
-        setAllDoctors(doctorsRes.data || []);
-        setDoctors(doctorsRes.data || []);
-        setClinics(clinicsRes.data || []);
-        setPatients((await GetPatientsAsync()).data || []); // Lấy danh sách bệnh nhân
-      } catch (error) {
-        setSpecialties([]);
-        setServices([]);
-        setAllDoctors([]);
-        setDoctors([]);
-        setClinics([]);
-        alert("Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại!");
-      } finally {
-        setIsLoadingForm(false);
-        setIsLoadingClinics(false);
-      }
-    };
-
-    fetchDropdowns();
-  }, [open]);
-
-  // Điền dữ liệu vào form khi sửa lịch
-  useEffect(() => {
-    if (
-      appointment &&
-      services.length &&
-      specialties.length &&
-      allDoctors.length &&
-      clinics.length
-    ) {
-      const fullDate = new Date(appointment.appointmentDate);
-
-      // Nếu backend trả về appointmentTime là "HH:mm:ss"
-      if (appointment.appointmentTime) {
-        const [h, m, s] = appointment.appointmentTime.split(":");
-        fullDate.setHours(Number(h));
-        fullDate.setMinutes(Number(m));
-        fullDate.setSeconds(Number(s) || 0);
-      }
-
-      setAppointmentDate(new Date(appointment.appointmentDate));
-      setAppointmentTime(new Date(fullDate));
-
-      setForm({
-        patientId: String(appointment.patientId) || "",
-        serviceId: String(appointment.serviceId) || "",
-        specialtyId: String(appointment.specialtyId) || "",
-        doctorId: String(appointment.doctorId) || "",
-        patientName: appointment.patientName || "",
-        clinicId: String(appointment.clinicId) || "",
-      });
-    } else if (!appointment) {
-      setForm(initialForm);
-      setAppointmentDate(null);
-      setAppointmentTime(null);
+  const fetchDropdowns = async () => {
+    setIsLoadingForm(true);
+    setIsLoadingClinics(true);
+    try {
+      const [specialtiesRes, servicesRes, doctorsRes, clinicsRes, patientsRes] =
+        await Promise.all([
+          GetSpecialtiesAsync(),
+          GetServicesAsync(),
+          GetDoctorsAsync(),
+          GetClinicsAsync(),
+          GetPatientsAsync(),
+        ]);
+      setSpecialties(specialtiesRes.data || []);
+      setServices(servicesRes.data || []);
+      setAllDoctors(doctorsRes.data || []);
+      setDoctors(doctorsRes.data || []);
+      setClinics(clinicsRes.data || []);
+      setPatients(patientsRes.data || []);
+    } catch (error) {
+      setSpecialties([]);
+      setServices([]);
+      setAllDoctors([]);
       setDoctors([]);
+      setClinics([]);
+      setPatients([]);
+      alert("Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại!");
+    } finally {
+      setIsLoadingForm(false);
+      setIsLoadingClinics(false);
     }
-  }, [appointment, services, specialties, allDoctors, clinics]);
+  };
+
+  fetchDropdowns();
+}, [open]);
+
+// useEffect để điền dữ liệu khi sửa lịch
+useEffect(() => {
+  if (
+    appointment &&
+    services.length &&
+    specialties.length &&
+    allDoctors.length &&
+    clinics.length
+  ) {
+    const fullDate = new Date(appointment.appointmentDate);
+
+    // Nếu backend trả về appointmentTime là "HH:mm:ss"
+    if (appointment.appointmentTime) {
+      const [h, m, s] = appointment.appointmentTime.split(":");
+      fullDate.setHours(Number(h));
+      fullDate.setMinutes(Number(m));
+      fullDate.setSeconds(Number(s) || 0);
+    }
+
+    setAppointmentDate(new Date(appointment.appointmentDate));
+    setAppointmentTime(new Date(fullDate));
+
+    setForm({
+      patientId: String(appointment.patientId) || "",
+      serviceId: String(appointment.serviceId) || "",
+      specialtyId: String(appointment.specialtyId) || "",
+      doctorId: String(appointment.doctorId) || "",
+      patientName: appointment.patientName || "",
+      clinicId: String(appointment.clinicId) || "",
+    });
+  } else if (!appointment) {
+    setForm(initialForm);
+    setAppointmentDate(null);
+    setAppointmentTime(null);
+    setDoctors([]);
+  }
+}, [appointment, services, specialties, allDoctors, clinics]); // Đảm bảo rằng nếu dữ liệu sửa đổi, useEffect sẽ chạy lại
+
 
   // Lọc bác sĩ theo chuyên khoa
   useEffect(() => {
@@ -237,26 +238,12 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       setForm((prev) => ({
         ...prev,
         specialtyId: value,
-        doctorId: "", // Clear doctor selection when specialty changes
+        doctorId: "",
       }));
     } else if (name === "doctorId" || name === "clinicId") {
       setForm((prev) => ({
         ...prev,
         [name]: value,
-      }));
-    } else if (name === "appointmentDate") {
-      // Cập nhật giá trị ngày
-      setAppointmentDate(value); // Cập nhật giá trị ngày
-      setForm((prev) => ({
-        ...prev,
-        appointmentDate: value, // Cập nhật form với giá trị ngày
-      }));
-    } else if (name === "appointmentTime") {
-      // Cập nhật giá trị giờ
-      setAppointmentTime(value); // Cập nhật giá trị giờ
-      setForm((prev) => ({
-        ...prev,
-        appointmentTime: value, // Cập nhật form với giá trị giờ
       }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
@@ -283,25 +270,32 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
 
       const submissionData = {
         appointmentId: appointment?.appointmentId || 0,
-        patientId: form.patientId, // Sử dụng patientId thay vì patientName
-        serviceId: form.serviceId,
-        doctorId: form.doctorId,
-        clinicId: form.clinicId,
-        specialtyId: form.specialtyId,
-        serviceName: selectedService?.serviceName || "",
+        patientName: form.patientName,
+        dateOfBirth:
+          patients.find((p) => String(p.patientId) === form.patientId)
+            ?.dateOfBirth || "",
         doctorName: selectedDoctor?.fullName || "",
-        clinicName: selectedClinic?.clinicName || "",
+        serviceName: selectedService?.serviceName || "",
         specialtyName: selectedSpecialty?.specialtyName || "",
-        appointmentDate: form.appointmentDate
-          ? new Date(form.appointmentDate).toISOString().split("T")[0]
+        clinicName: selectedClinic?.clinicName || "",
+        appointmentDate: appointmentDate
+          ? appointmentDate.toISOString()
           : "",
-        appointmentTime: form.appointmentTime
-          ? form.appointmentTime.toISOString().split("T")[1].split(".")[0]
+        appointmentTime: appointmentTime
+          ? appointmentTime.toISOString().split("T")[1].split(".")[0]
           : "",
       };
 
       console.log("Dữ liệu gửi đi:", submissionData);
       onSubmit(submissionData);
+      
+      // Reset form sau khi submit thành công
+      setForm(initialForm);
+      setAppointmentDate(null);
+      setAppointmentTime(null);
+      setErrors({});
+      setPatientExists(true);
+      
       onClose();
 
       setShowSuccessMessage(true);
@@ -311,38 +305,61 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
     }
   };
 
-  // Xử lý hủy form
+  // Xử lý hủy form - SỬA LẠI LOGIC
   const handleCancel = () => {
-    const hasData =
-      Object.values(form).some(
-        (value) => value && value.toString().trim() !== ""
-      ) ||
-      appointmentDate ||
-      appointmentTime;
+    // Sửa lại logic kiểm tra dữ liệu để tránh lỗi
+    const hasFormData = Object.values(form).some((value) => {
+      return value != null && value !== "" && String(value).trim() !== "";
+    });
+    
+    const hasDateTimeData = appointmentDate !== null || appointmentTime !== null;
+    
+    const hasData = hasFormData || hasDateTimeData;
+
+    console.log("Kiểm tra dữ liệu:", { 
+      hasFormData, 
+      hasDateTimeData, 
+      hasData, 
+      form,
+      appointmentDate,
+      appointmentTime
+    });
+
     if (hasData) {
       setShowCancelModal(true);
     } else {
+      // Reset form trước khi đóng
+      setForm(initialForm);
+      setAppointmentDate(null);
+      setAppointmentTime(null);
+      setErrors({});
+      setPatientExists(true);
       onClose();
     }
   };
 
-  if (!open) return null;
-
   return (
     <>
-      {showCancelModal ? (
-        <ConfirmModal
-          open={showCancelModal}
-          title="XÁC NHẬN THOÁT"
-          message={
-            appointment
-              ? "Bạn có muốn thoát khỏi chức năng đổi lịch khám không?"
-              : "Bạn có muốn thoát khỏi chức năng thêm lịch khám không?"
-          }
-          onConfirm={onClose}
-          onCancel={() => setShowCancelModal(false)}
-        />
-      ) : (
+      {/* Modal xác nhận - luôn render */}
+<ConfirmModal 
+  isOpen={showCancelModal}
+  title="Xác nhận thoát"
+  message={
+    appointment 
+      ? "Bạn có muốn thoát khỏi chức năng sửa lịch khám không?" // Thông báo khi đang sửa lịch
+      : "Bạn có muốn thoát khỏi chức năng thêm lịch khám không?" // Thông báo khi đang thêm lịch
+  }
+  onConfirm={() => {
+    setShowCancelModal(false);  // Đóng modal sau khi xác nhận
+    onClose();  // Đóng form
+  }}  
+  onCancel={() => setShowCancelModal(false)}  // Đóng modal nếu người dùng hủy bỏ
+  iconType={undefined}  // Có thể tùy chỉnh thêm nếu cần thiết
+/>
+
+
+      {/* Form chính - chỉ render khi open = true */}
+      {open && (
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
@@ -381,6 +398,9 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
+                    {errors.serviceId && (
+                      <p className="error">{errors.serviceId}</p>
+                    )}
                   </div>
 
                   {/* Chuyên khoa */}
@@ -401,6 +421,9 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
+                    {errors.specialtyId && (
+                      <p className="error">{errors.specialtyId}</p>
+                    )}
                   </div>
 
                   {/* Bác sĩ */}
@@ -421,6 +444,9 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
+                    {errors.doctorId && (
+                      <p className="error">{errors.doctorId}</p>
+                    )}
                   </div>
 
                   {/* Tên bệnh nhân */}
@@ -431,7 +457,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                     <select
                       name="patientId"
                       value={form.patientId}
-                      onChange={handlePatientChange} // Sử dụng hàm kiểm tra khi thay đổi patientId
+                      onChange={handlePatientChange}
                       required
                     >
                       <option value="">Chọn bệnh nhân</option>
@@ -444,8 +470,8 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
-                    {errors.patientId && (
-                      <p className="error">{errors.patientId}</p>
+                    {errors.patientName && (
+                      <p className="error">{errors.patientName}</p>
                     )}
                   </div>
 
@@ -458,16 +484,15 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       selected={appointmentDate}
                       onChange={(date) => {
                         setAppointmentDate(date);
-                        setForm((prev) => ({
-                          ...prev,
-                          appointmentDate: date, // Cập nhật giá trị cho form
-                        }));
                       }}
                       dateFormat="yyyy-MM-dd"
                       placeholderText="Chọn ngày"
                       className="form-control"
                       required
                     />
+                    {errors.appointmentDate && (
+                      <p className="error">{errors.appointmentDate}</p>
+                    )}
                   </div>
 
                   {/* Giờ khám */}
@@ -479,10 +504,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       selected={appointmentTime}
                       onChange={(time) => {
                         setAppointmentTime(time);
-                        setForm((prev) => ({
-                          ...prev,
-                          appointmentTime: time, // Cập nhật giá trị giờ cho form
-                        }));
                       }}
                       showTimeSelect
                       showTimeSelectOnly
@@ -493,6 +514,9 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       className="form-control"
                       required
                     />
+                    {errors.appointmentTime && (
+                      <p className="error">{errors.appointmentTime}</p>
+                    )}
                   </div>
 
                   {/* Phòng khám */}
@@ -516,6 +540,9 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
+                    {errors.clinicId && (
+                      <p className="error">{errors.clinicId}</p>
+                    )}
                   </div>
                 </div>
 
@@ -531,6 +558,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                     Hủy bỏ
                   </button>
                 </div>
+
                 {showSuccessMessage && (
                   <div className="success-message">
                     <p>Lịch hẹn đã được lưu thành công!</p>
