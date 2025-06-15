@@ -1,31 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import '../../../style/ServicesForm.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons';
 import { GetSpecialtiesAsync, GetDoctorsAsync } from '../../../api/ServicesDropdownApi';
 
-const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, iconType }) => {
-  if (!isOpen) return null;
+const ConfirmModal = ({ open, title, message, onConfirm, onCancel }) => {
+  if (!open) return null;
   return (
-    <div className="confirm-modal-overlay">
-      <div className="confirm-modal">
-        <div className="confirm-modalheader">
-          <h3 className="modal-title">{title}</h3>
-          <button className="close-btn" onClick={onCancel} aria-label="Close">×</button>
+    <div className="w-confirm-modal-overlay">
+      <div className="w-confirm-modal">
+        <div className="w-confirm-modal-header">
+          <h3 className="w-modal-title">{title}</h3>
+          <button className="close-button" onClick={onCancel} aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
-        <div className="confirm-modal-body">
-          <div className="confirm-modal-icon">
-            {iconType === 'warning' && (
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1D479A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12" y2="16" />
-              </svg>
-            )}
-          </div>
-          <p className="modal-message">{message}</p>
+        <div className="w-confirm-modal-body">
+          <FontAwesomeIcon icon={faCircleQuestion} style={{ color: '#1D479A', marginRight: '8px' }} />
+          <p className="w-modal-message">{message}</p>
         </div>
-        <div className="modal-actions">
-          <button className="modal-btn confirm" onClick={onConfirm}>Xác nhận</button>
-          <button className="modal-btn cancel" onClick={onCancel}>Hủy bỏ</button>
+        <div className="w-modal-actions">
+          <button className="w-modal-button confirm" onClick={onConfirm}>Xác nhận</button>
+          <button className="w-modal-button cancel" onClick={onCancel}>Hủy bỏ</button>
         </div>
       </div>
     </div>
@@ -452,13 +451,12 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
           </form>
         </div>
       </div>
-      <ConfirmModal 
-        isOpen={showCancelModal}
-        title="Xác nhận thoát"
-        message="Bạn có muốn thoát khỏi chức năng thêm/sửa dịch vụ không?"
+      <ConfirmModal
+        open={showCancelModal}
+        title="XÁC NHẬN THOÁT"
+        message={editingService ? 'Bạn có muốn thoát khỏi chức năng sửa dịch vụ không?' : 'Bạn có muốn thoát khỏi chức năng thêm dịch vụ không?'}
         onConfirm={onClose}
         onCancel={() => setShowCancelModal(false)}
-        iconType={undefined}
       />
       {showSuccessMessage && (
         <div className="success-toast">
