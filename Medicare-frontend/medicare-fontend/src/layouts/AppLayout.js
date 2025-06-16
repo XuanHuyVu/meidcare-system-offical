@@ -8,7 +8,7 @@ import Dashboard from '../features/coordinator/dashboard/Dashboard';
 import ServicesList from '../features/coordinator/services/ServicesList';
 import WorkSchedulesList from '../features/coordinator/workschedules/WorkSchedulesList';
 import AppointmentList from '../features/coordinator/appointments/AppointmentList';
-
+import PatientsList from '../features/coordinator/patients/PatientsList';
 function AppLayout() {
   const location = useLocation();
 
@@ -23,6 +23,7 @@ function AppLayout() {
             <Route path="/workschedules" element={<WorkSchedulesList />} />
             <Route path="/services" element={<ServicesList />} />
             <Route path="/appointments" element={<AppointmentList />} />
+            <Route path="/patients" element={<PatientsList />} />
           </Routes>
         </div>
         {location.pathname !== '/' && <Footer />}
