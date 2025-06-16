@@ -108,83 +108,125 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
   };
 
   // Load dữ liệu khi mở form
-// useEffect để tải dữ liệu khi mở modal
-useEffect(() => {
-  if (!open) return;
+  // useEffect để tải dữ liệu khi mở modal
+  useEffect(() => {
+    if (!open) return;
 
-  const fetchDropdowns = async () => {
-    setIsLoadingForm(true);
-    setIsLoadingClinics(true);
-    try {
-      const [specialtiesRes, servicesRes, doctorsRes, clinicsRes, patientsRes] =
-        await Promise.all([
+    const fetchDropdowns = async () => {
+      setIsLoadingForm(true);
+      setIsLoadingClinics(true);
+      try {
+        const [
+          specialtiesRes,
+          servicesRes,
+          doctorsRes,
+          clinicsRes,
+          patientsRes,
+        ] = await Promise.all([
           GetSpecialtiesAsync(),
           GetServicesAsync(),
           GetDoctorsAsync(),
           GetClinicsAsync(),
           GetPatientsAsync(),
         ]);
-      setSpecialties(specialtiesRes.data || []);
-      setServices(servicesRes.data || []);
-      setAllDoctors(doctorsRes.data || []);
-      setDoctors(doctorsRes.data || []);
-      setClinics(clinicsRes.data || []);
-      setPatients(patientsRes.data || []);
-    } catch (error) {
-      setSpecialties([]);
-      setServices([]);
-      setAllDoctors([]);
-      setDoctors([]);
-      setClinics([]);
-      setPatients([]);
-      alert("Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại!");
-    } finally {
-      setIsLoadingForm(false);
-      setIsLoadingClinics(false);
+        setSpecialties(specialtiesRes.data || []);
+        setServices(servicesRes.data || []);
+        setAllDoctors(doctorsRes.data || []);
+        setDoctors(doctorsRes.data || []);
+        setClinics(clinicsRes.data || []);
+        setPatients(patientsRes.data || []);
+      } catch (error) {
+        setSpecialties([]);
+        setServices([]);
+        setAllDoctors([]);
+        setDoctors([]);
+        setClinics([]);
+        setPatients([]);
+        alert("Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại!");
+      } finally {
+        setIsLoadingForm(false);
+        setIsLoadingClinics(false);
+      }
+    };
+
+    fetchDropdowns();
+  }, [open]);
+
+  // useEffect để điền dữ liệu khi sửa lịch
+  // useEffect để điền dữ liệu khi sửa lịch - ĐÃ SỬA
+  useEffect(() => {
+    if (
+      appointment &&
+      services.length &&
+      specialties.length &&
+      allDoctors.length &&
+      clinics.length &&
+      patients.length
+    ) {
+      const fullDate = new Date(appointment.appointmentDate);
+
+      // Nếu backend trả về appointmentTime là "HH:mm:ss"
+      if (appointment.appointmentTime) {
+        const [h, m, s] = appointment.appointmentTime.split(":");
+        fullDate.setHours(Number(h));
+        fullDate.setMinutes(Number(m));
+        fullDate.setSeconds(Number(s) || 0);
+      }
+
+      // Cập nhật ngày và giờ khám
+      setAppointmentDate(new Date(appointment.appointmentDate));
+      setAppointmentTime(new Date(fullDate));
+
+      // TÌM ID THAY VÌ DÙNG TÊN để điền vào combobox
+
+      // Tìm serviceId từ serviceName
+      const selectedService = services.find(
+        (service) => service.serviceName === appointment.serviceName
+      );
+
+      // Tìm specialtyId từ specialtyName
+      const selectedSpecialty = specialties.find(
+        (specialty) => specialty.specialtyName === appointment.specialtyName
+      );
+
+      // Tìm doctorId từ doctorName
+      const selectedDoctor = allDoctors.find(
+        (doctor) => doctor.fullName === appointment.doctorName
+      );
+
+      // Tìm clinicId từ clinicName
+      const selectedClinic = clinics.find(
+        (clinic) => clinic.clinicName === appointment.clinicName
+      );
+
+      // Tìm patientId từ patientName
+      const selectedPatient = patients.find(
+        (patient) => patient.fullName === appointment.patientName
+      );
+
+      // Điền dữ liệu vào form với ID thay vì name
+      setForm({
+        serviceId: selectedService ? String(selectedService.serviceId) : "",
+        specialtyId: selectedSpecialty
+          ? String(selectedSpecialty.specialtyId)
+          : "",
+        doctorId: selectedDoctor ? String(selectedDoctor.doctorId) : "",
+        patientId: selectedPatient ? String(selectedPatient.patientId) : "",
+        patientName: appointment.patientName || "",
+        clinicId: selectedClinic ? String(selectedClinic.clinicId) : "",
+      });
+
+      // Cập nhật trạng thái patientExists
+      setPatientExists(!!selectedPatient);
+    } else if (!appointment) {
+      // Nếu không có appointment, reset form về giá trị mặc định
+      setForm(initialForm);
+      setAppointmentDate(null);
+      setAppointmentTime(null);
+      setDoctors([]); // Clear doctors if no appointment
+      setPatientExists(true);
     }
-  };
-
-  fetchDropdowns();
-}, [open]);
-
-// useEffect để điền dữ liệu khi sửa lịch
-useEffect(() => {
-  if (
-    appointment &&
-    services.length &&
-    specialties.length &&
-    allDoctors.length &&
-    clinics.length
-  ) {
-    const fullDate = new Date(appointment.appointmentDate);
-
-    // Nếu backend trả về appointmentTime là "HH:mm:ss"
-    if (appointment.appointmentTime) {
-      const [h, m, s] = appointment.appointmentTime.split(":");
-      fullDate.setHours(Number(h));
-      fullDate.setMinutes(Number(m));
-      fullDate.setSeconds(Number(s) || 0);
-    }
-
-    setAppointmentDate(new Date(appointment.appointmentDate));
-    setAppointmentTime(new Date(fullDate));
-
-    setForm({
-      patientId: String(appointment.patientId) || "",
-      serviceId: String(appointment.serviceId) || "",
-      specialtyId: String(appointment.specialtyId) || "",
-      doctorId: String(appointment.doctorId) || "",
-      patientName: appointment.patientName || "",
-      clinicId: String(appointment.clinicId) || "",
-    });
-  } else if (!appointment) {
-    setForm(initialForm);
-    setAppointmentDate(null);
-    setAppointmentTime(null);
-    setDoctors([]);
-  }
-}, [appointment, services, specialties, allDoctors, clinics]); // Đảm bảo rằng nếu dữ liệu sửa đổi, useEffect sẽ chạy lại
-
+  }, [appointment, services, specialties, allDoctors, clinics, patients]); // Thêm patients vào dependencies // Chạy lại useEffect khi dữ liệu thay đổi
 
   // Lọc bác sĩ theo chuyên khoa
   useEffect(() => {
@@ -262,7 +304,7 @@ useEffect(() => {
         (d) => String(d.doctorId) === String(form.doctorId)
       );
       const selectedClinic = clinics.find(
-        (c) => String(c.clinicId) === String(form.clinicId)
+        (c) => String(c.clinicId) === String(form.clinicId) // Lấy clinicId từ form
       );
       const selectedSpecialty = specialties.find(
         (s) => String(s.specialtyId) === String(form.specialtyId)
@@ -277,25 +319,24 @@ useEffect(() => {
         doctorName: selectedDoctor?.fullName || "",
         serviceName: selectedService?.serviceName || "",
         specialtyName: selectedSpecialty?.specialtyName || "",
-        clinicName: selectedClinic?.clinicName || "",
-        appointmentDate: appointmentDate
-          ? appointmentDate.toISOString()
-          : "",
+        clinicName: selectedClinic?.clinicName || "", // Nếu cần, vẫn có thể lấy tên phòng khám
+        appointmentDate: appointmentDate ? appointmentDate.toISOString() : "",
         appointmentTime: appointmentTime
           ? appointmentTime.toISOString().split("T")[1].split(".")[0]
           : "",
+        clinicId: selectedClinic?.clinicId || "", // Lưu clinicId thay vì clinicName
       };
 
       console.log("Dữ liệu gửi đi:", submissionData);
       onSubmit(submissionData);
-      
+
       // Reset form sau khi submit thành công
       setForm(initialForm);
       setAppointmentDate(null);
       setAppointmentTime(null);
       setErrors({});
       setPatientExists(true);
-      
+
       onClose();
 
       setShowSuccessMessage(true);
@@ -311,18 +352,19 @@ useEffect(() => {
     const hasFormData = Object.values(form).some((value) => {
       return value != null && value !== "" && String(value).trim() !== "";
     });
-    
-    const hasDateTimeData = appointmentDate !== null || appointmentTime !== null;
-    
+
+    const hasDateTimeData =
+      appointmentDate !== null || appointmentTime !== null;
+
     const hasData = hasFormData || hasDateTimeData;
 
-    console.log("Kiểm tra dữ liệu:", { 
-      hasFormData, 
-      hasDateTimeData, 
-      hasData, 
+    console.log("Kiểm tra dữ liệu:", {
+      hasFormData,
+      hasDateTimeData,
+      hasData,
       form,
       appointmentDate,
-      appointmentTime
+      appointmentTime,
     });
 
     if (hasData) {
@@ -341,22 +383,21 @@ useEffect(() => {
   return (
     <>
       {/* Modal xác nhận - luôn render */}
-<ConfirmModal 
-  isOpen={showCancelModal}
-  title="Xác nhận thoát"
-  message={
-    appointment 
-      ? "Bạn có muốn thoát khỏi chức năng sửa lịch khám không?" // Thông báo khi đang sửa lịch
-      : "Bạn có muốn thoát khỏi chức năng thêm lịch khám không?" // Thông báo khi đang thêm lịch
-  }
-  onConfirm={() => {
-    setShowCancelModal(false);  // Đóng modal sau khi xác nhận
-    onClose();  // Đóng form
-  }}  
-  onCancel={() => setShowCancelModal(false)}  // Đóng modal nếu người dùng hủy bỏ
-  iconType={undefined}  // Có thể tùy chỉnh thêm nếu cần thiết
-/>
-
+      <ConfirmModal
+        isOpen={showCancelModal}
+        title="Xác nhận thoát"
+        message={
+          appointment
+            ? "Bạn có muốn thoát khỏi chức năng sửa lịch khám không?" // Thông báo khi đang sửa lịch
+            : "Bạn có muốn thoát khỏi chức năng thêm lịch khám không?" // Thông báo khi đang thêm lịch
+        }
+        onConfirm={() => {
+          setShowCancelModal(false); // Đóng modal sau khi xác nhận
+          onClose(); // Đóng form
+        }}
+        onCancel={() => setShowCancelModal(false)} // Đóng modal nếu người dùng hủy bỏ
+        iconType={undefined} // Có thể tùy chỉnh thêm nếu cần thiết
+      />
 
       {/* Form chính - chỉ render khi open = true */}
       {open && (

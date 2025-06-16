@@ -96,11 +96,10 @@ const AppointmentList = () => {
     setOpenDetail(true);
   };
 
-  const handleDeleteClick = (appointment) => {
-    // Save the appointment ID to be deleted
+const handleDeleteClick = (appointment) => {
     setAppointmentToDelete(appointment.appointmentId);
     setShowConfirmModal(true); // Show confirmation modal
-  };
+};
 
   const confirmDeleteAppointment = async () => {
     if (appointmentToDelete) {
@@ -128,12 +127,30 @@ const AppointmentList = () => {
     } else {
       alert("Không có ID hợp lệ để xóa lịch hẹn!");
     }
-  };
+};
 
-  const handleCancelDelete = () => {
-    setShowConfirmModal(false); // Close confirmation modal without deleting
-    setAppointmentToDelete(null); // Reset appointment ID
-  };
+const handleCancelDelete = () => {
+  setShowConfirmModal(false); // Close confirmation modal without deleting
+  setAppointmentToDelete(null); // Reset appointment ID
+};
+
+    const CustomWarningIcon = () => (
+    <svg width="50" height="50" viewBox="0 0 24 24" style={{ marginRight: '10px' }}>
+      {/* Tam giác vàng không viền */}
+      <path 
+        d="M12 2L22 20H2L12 2Z" 
+        fill="#FFB636"
+      />
+      {/* Dấu chấm than đen */}
+      <path 
+        d="M12 7V13M12 15.5H12.01" 
+        stroke="#2B3B47" 
+        strokeWidth="1.5" 
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+);
 
 // Số bản ghi hiển thị
 const startIndex = (currentPage - 1) * pageSize; // Bắt đầu từ bản ghi nào
@@ -306,7 +323,7 @@ const handlePageSizeChange = (e) => {
         <option value={50}>50</option>
       </select>
     </div>
-            <button 
+        <button 
           disabled={currentPage === 1} 
           onClick={() => handlePageChange(currentPage - 1)} 
           className="pagination-btn"
@@ -329,18 +346,23 @@ const handlePageSizeChange = (e) => {
         >
           Sau
         </button>
-  </div>    
-</div>
+      </div>    
+    </div>
 
 
-      {/* Confirmation modal for deleting */}
-      <ConfirmModal
-        isOpen={showConfirmModal}
-        title="Xác nhận xóa"
-        message="Bạn có chắc chắn muốn xóa lịch hẹn này?"
-        onConfirm={confirmDeleteAppointment}
-        onCancel={handleCancelDelete}
-      />
+
+          <ConfirmModal 
+            isOpen={showConfirmModal}
+            title="XÓA LỊCH HẸN"
+            message={
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <CustomWarningIcon />
+                Bạn có chắc chắn muốn xóa lịch hẹn này không?
+              </div>
+            }
+            onConfirm={confirmDeleteAppointment} // Thực hiện xóa
+            onCancel={handleCancelDelete} // Hủy bỏ xóa
+          />
     </div>
   );
 };
