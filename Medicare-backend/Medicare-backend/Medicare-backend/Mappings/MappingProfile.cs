@@ -40,12 +40,7 @@ namespace Medicare_backend.Mappings
             CreateMap<User, UserDto>().ReverseMap();
 
             CreateMap<Appointment, AppointmentDto>()
-                .ForMember(dest => dest.PatientName, opt => opt.MapFrom(src => src.Patient.FullName))
                 .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.Patient.DateOfBirth))
-                .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(src => src.Doctor.FullName))
-                .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.Service.ServiceName))
-                .ForMember(dest => dest.SpecialtyName, opt => opt.MapFrom(src => src.Service.Specialty.SpecialtyName))
-                .ForMember(dest => dest.ClinicName, opt => opt.MapFrom(src => src.Clinic.ClinicName))
                 .ReverseMap();
         }
     }
