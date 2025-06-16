@@ -1,11 +1,13 @@
 .confirm-modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(67, 66, 66, 0);
   z-index: 3000;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 400px;
+  margin: 0 auto;
   overflow-y: auto;
 }
 .confirm-modal {

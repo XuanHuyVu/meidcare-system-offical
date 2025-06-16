@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { faInfoCircle, faEdit, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons';
 import '../../../style/Services.css';
 import { GetAllAsync, CreateAsync, UpdateAsync, DeleteAsync } from '../../../api/ServicesApi';
@@ -113,6 +114,23 @@ const ServicesList = () => {
       filterStatus === 'inactive' ? (service?.isActive === false) : true;
     return matchesSearch && matchesFilter;
   });
+  const CustomWarningIcon = () => (
+    <svg width="50" height="50" viewBox="0 0 24 24" style={{ marginRight: '10px' }}>
+      {/* Tam giác vàng không viền */}
+      <path 
+        d="M12 2L22 20H2L12 2Z" 
+        fill="#FFB636"
+      />
+      {/* Dấu chấm than đen */}
+      <path 
+        d="M12 7V13M12 15.5H12.01" 
+        stroke="#2B3B47" 
+        strokeWidth="1.5" 
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+);
 
   // Pagination calculations
   const totalRecords = filteredServices.length;
@@ -404,15 +422,19 @@ const ServicesList = () => {
 
 
       {showAddForm && <ServicesForm onClose={() => setShowAddForm(false)} onSubmit={handleAddService} />}
-      {showEditForm && <ServicesForm onClose={() => setShowEditForm(false)} editingService={editingService} onSubmit={handleEditServiceSubmit} />}
-      
-      <ConfirmModal 
-        isOpen={showDeleteModal}
-        title="Xác nhận xóa"
-        message="Bạn có chắc chắn muốn xóa dịch vụ này?"
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setShowDeleteModal(false)}
-      />
+      {showEditForm && <ServicesForm onClose={() => setShowEditForm(false)} editingService={editingService} onSubmit={handleEditServiceSubmit} />} 
+    <ConfirmModal 
+      isOpen={showDeleteModal}
+      title="XÓA DỊCH VỤ"
+      message={
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <CustomWarningIcon />
+          Bạn có chắc chắn muốn xóa dịch vụ này không?
+        </div>
+      }
+      onConfirm={handleConfirmDelete}
+      onCancel={() => setShowDeleteModal(false)}
+    />
       {showDetail && detailService && (
         <ServicesDetail service={detailService} onClose={handleCloseDetail} doctors={doctors} specialties={specialties} />
       )}
