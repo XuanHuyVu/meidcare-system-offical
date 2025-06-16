@@ -103,13 +103,7 @@ const WorkSchedulesList = () => {
           'PUT',
           formData
         );
-        setSchedules(prev => 
-          prev.map(schedule => 
-            schedule.scheduleId === editingSchedule.scheduleId 
-              ? { ...schedule, ...formData } 
-              : schedule
-          )
-        );
+        await fetchSchedules(); // Refresh after update
       } else {
         // Create
         const newSchedule = await apiRequest(
@@ -117,7 +111,8 @@ const WorkSchedulesList = () => {
           'POST',
           formData
         );
-        setSchedules(prev => [...prev, newSchedule]);
+        setSchedules(prev => [newSchedule, ...prev]);
+        await fetchSchedules();
       }
       handleCloseForm();
     } catch (error) {
@@ -344,8 +339,8 @@ const WorkSchedulesList = () => {
 
       <ConfirmModal
         isOpen={showDeleteModal}
-        title="Xác nhận xóa"
-        message="Bạn có chắc chắn muốn xóa lịch làm việc này?"
+        title="XÓA LỊCH LÀM VIỆC"
+        message="Bạn có chắc chắn muốn xóa lịch làm việc này không?"
         onConfirm={confirmDelete}
         onCancel={() => setShowDeleteModal(false)}
       />

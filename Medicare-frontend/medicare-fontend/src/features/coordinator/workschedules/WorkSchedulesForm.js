@@ -154,8 +154,8 @@ const WorkScheduleForm = ({ onClose, onSubmit, editingSchedule = null }) => {
               <select id="doctorId" name="doctorId" value={formData.doctorId} onChange={handleInputChange} className={errors.doctorId ? 'error' : ''}>
                 <option value="">-- Chọn bác sĩ --</option>
                 {doctors.filter(Boolean).map((doctor, index) => (
-                  <option key={doctor.id || `doctor-${index}`} value={doctor.id?.toString()}>
-                    {doctor.fullName}
+                  <option key={doctor.doctorId || `doctor-${index}`} value={doctor.doctorId?.toString()}>
+                    {doctor.fullName || "Không rõ tên" }
                   </option>
                 ))}
               </select>
@@ -167,7 +167,7 @@ const WorkScheduleForm = ({ onClose, onSubmit, editingSchedule = null }) => {
                 <select id="specialtyId" name="specialtyId" value={formData.specialtyId} onChange={handleInputChange} className={errors.specialtyId ? 'error' : ''}>
                   <option value="">-- Chọn chuyên khoa --</option>
                   {specialties.filter(Boolean).map((specialty, index) => (
-                    <option key={specialty.id || `specialty-${index}`} value={specialty.id}>
+                    <option key={specialty.specialtyId || `specialty-${index}`} value={specialty.specialtyId?.toString()}>
                       {specialty.specialtyName}
                     </option>
                   ))}
@@ -207,7 +207,7 @@ const WorkScheduleForm = ({ onClose, onSubmit, editingSchedule = null }) => {
                 <select id="clinicId" name="clinicId" value={formData.clinicId} onChange={handleInputChange} className={errors.clinicId ? 'error' : ''}>
                   <option value="">-- Chọn phòng khám --</option>
                   {clinics.filter(Boolean).map((clinic, index) => (
-                    <option key={clinic.id || `clinic-${index}`} value={clinic.id}>
+                    <option key={clinic.clinicId || `clinic-${index}`} value={clinic.clinicId?.toString()}>
                       {clinic.clinicName}
                     </option>
                   ))}
@@ -221,7 +221,7 @@ const WorkScheduleForm = ({ onClose, onSubmit, editingSchedule = null }) => {
                 <select id="serviceId" name="serviceId" value={formData.serviceId} onChange={handleInputChange} className={errors.serviceId ? 'error' : ''}>
                   <option value="">-- Chọn dịch vụ --</option>
                   {services.filter(Boolean).map((service, index) => (
-                    <option key={service.id || `service-${index}`} value={service.id}>
+                    <option key={service.serviceId || `service-${index}`} value={service.serviceId}>
                       {service.serviceName}
                     </option>
                   ))}
