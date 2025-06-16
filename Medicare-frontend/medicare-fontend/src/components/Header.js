@@ -77,15 +77,15 @@ const Header = () => {
               <div className="dropdown-menu">
                 <div className="dropdown-item">
                   <FontAwesomeIcon icon={faUser} />
-                  <span>Thông tin tài khoản</span>
+                  <span>  Thông tin tài khoản</span>
                 </div>
                 <div className="dropdown-item">
                   <FontAwesomeIcon icon={faCog} />
-                  <span>Cài đặt thông báo</span>
+                  <span>  Cài đặt thông báo</span>
                 </div>
                 <div className="dropdown-item logout" onClick={handleLogout}>
                   <FontAwesomeIcon icon={faSignOutAlt} />
-                  <span>Đăng xuất</span>
+                  <span>  Đăng xuất</span>
                 </div>
               </div>
             )}
