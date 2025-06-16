@@ -8,7 +8,6 @@ const axiosInstance = axios.create({
   },
 });
 
-// Interceptor: Gắn token vào mọi request nếu có
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');

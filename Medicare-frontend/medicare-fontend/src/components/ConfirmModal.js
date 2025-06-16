@@ -1,12 +1,24 @@
 import React from 'react';
 import '../style/ConfirmModal.css';
 
-const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, iconType }) => {
+const ConfirmModal = ({
+  isOpen,
+  title,
+  message,
+  onConfirm,
+  onCancel,
+  iconType = '' // Thêm giá trị mặc định
+}) => {
   if (!isOpen) return null;
 
   return (
-    <div className="confirm-modal-overlay">
-      <div className="confirm-modal">
+    <div
+      className="confirm-modal-overlay"
+      onClick={e => {
+        if (e.target === e.currentTarget && typeof onRequestClose === 'function') onRequestClose();
+      }}
+    >
+      <div className="confirm-modal" onClick={e => e.stopPropagation()}>
         <div className="confirm-modal-header">
           <h3 className="modal-title">{title}</h3>
           <button className="close-btn" onClick={onCancel} aria-label="Close">
