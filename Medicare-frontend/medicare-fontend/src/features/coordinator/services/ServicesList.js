@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faEdit, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons';
 import '../../../style/Services.css';
-import { GetAllAsync, CreateAsync, UpdateAsync, DeleteAsync } from '../../../api/ServicesApi';
+import { GetAllAsync, CreateAsync, UpdateAsync, DeleteAsync, GetByIdAsync } from '../../../api/ServicesApi';
 import { GetDoctorsAsync, GetSpecialtiesAsync } from '../../../api/ServicesDropdownApi';
 import ServicesForm from './ServicesForm';  // Form to add/edit service
 import ConfirmModal from '../../../components/ConfirmModal';  // Confirmation modal for delete
 import ServicesDetail from './ServicesDetail';
+import ErrorModal from '../../../components/ErrorModal';
 
 const ServicesList = () => {
   // State management
@@ -20,12 +21,18 @@ const ServicesList = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessageText, setSuccessMessageText] = useState('');
   const [showDetail, setShowDetail] = useState(false);
   const [detailService, setDetailService] = useState(null);
+  const [showErrorModal, setShowErrorModal] = useState(false); // Modal lỗi
+  const [errorModalMessage, setErrorModalMessage] = useState('');
+  const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState(false); // Modal xác nhận xóa thành công
+  const [showNotFoundModal, setShowNotFoundModal] = useState(false); // Modal không tìm thấy dịch vụ
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
+  const [searchError, setSearchError] = useState('');
+
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -113,23 +120,6 @@ const ServicesList = () => {
       filterStatus === 'inactive' ? (service?.isActive === false) : true;
     return matchesSearch && matchesFilter;
   });
-  const CustomWarningIcon = () => (
-    <svg width="50" height="50" viewBox="0 0 24 24" style={{ marginRight: '10px' }}>
-      {/* Tam giác vàng không viền */}
-      <path 
-        d="M12 2L22 20H2L12 2Z" 
-        fill="#FFB636"
-      />
-      {/* Dấu chấm than đen */}
-      <path 
-        d="M12 7V13M12 15.5H12.01" 
-        stroke="#2B3B47" 
-        strokeWidth="1.5" 
-        strokeLinecap="round"
-        fill="none"
-      />
-    </svg>
-);
 
   // Pagination calculations
   const totalRecords = filteredServices.length;
@@ -141,6 +131,13 @@ const ServicesList = () => {
   useEffect(() => { 
     setCurrentPage(1); 
   }, [pageSize, filterStatus, searchTerm]);
+
+  // Khi thay đổi search/filter mà không có kết quả, show modal
+  useEffect(() => {
+    if (searchTerm.trim() && filteredServices.length === 0) {
+      setShowNotFoundModal(true);
+    }
+  }, [searchTerm, filterStatus, specialties, doctors]);
 
   // CRUD Operations
   const handleAddService = async (serviceData) => {
@@ -186,33 +183,32 @@ const ServicesList = () => {
     }
   };
 
-  const handleDeleteService = (id) => {
-    console.log('🗑️ Preparing to delete service:', id);
-    setDeleteId(id);
-    setShowDeleteModal(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    console.log('🗑️ Deleting service:', deleteId);
+  const handleDeleteService = async (id) => {
     try {
-      await DeleteAsync(deleteId);
-      console.log('✅ Service deleted successfully');
-      
-      // Remove service from the list
-      setServices(prev => prev.filter(s => s.serviceId !== deleteId));
-      setShowDeleteModal(false);
+      await GetByIdAsync(id);
+      setPendingDeleteId(id);
+      setShowConfirmDeleteModal(true);
+    } catch (error) {
+      setErrorModalMessage('Dịch vụ không tồn tại hoặc không thể xóa do đang được sử dụng. Vui lòng kiểm tra lại.');
+      setShowErrorModal(true);
+    }
+  };
+  
+  const handleConfirmDelete = async () => {
+    try {
+      await DeleteAsync(pendingDeleteId);
+      setServices(prev => prev.filter(s => s.serviceId !== pendingDeleteId));
+      setShowConfirmDeleteModal(false);
       setSuccessMessageText('Xóa dịch vụ khám thành công!');
       setShowSuccessMessage(true);
       setTimeout(() => setShowSuccessMessage(false), 2500);
     } catch (error) {
-      console.error('❌ Error deleting service:', error);
-      setShowDeleteModal(false);
-      setSuccessMessageText('Xóa dịch vụ khám thất bại!');
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 2500);
+      setShowConfirmDeleteModal(false);
+      setErrorModalMessage('Dịch vụ không tồn tại hoặc không thể xóa do đang được sử dụng. Vui lòng kiểm tra lại.');
+      setShowErrorModal(true);
     }
   };
-
+  
   // Change filter status (active, inactive, all)
   const handleFilterChange = (status) => {
     setFilterStatus(status);
@@ -241,6 +237,15 @@ const ServicesList = () => {
   const handleCloseDetail = () => {
     setShowDetail(false);
     setDetailService(null);
+  };
+
+  // Xử lý tìm kiếm khi ấn icon
+  const handleSearchClick = () => {
+    if (!searchTerm.trim()) {
+      setSearchError('Vui lòng nhập nội dung tìm kiếm');
+    } else {
+      setSearchError('');
+    }
   };
 
   if (loading) {
@@ -297,17 +302,21 @@ const ServicesList = () => {
             <option value="inactive">Không hoạt động</option>
           </select>
         </div>
-        <div className="services-search-group-right">
-          <FontAwesomeIcon icon={faSearch} className="search-icon" />
+        <div className="services-search-group-right" style={{ position: 'relative' }}>
           <input
             type="text"
             placeholder="Tìm kiếm dịch vụ khám"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => { setSearchTerm(e.target.value); setSearchError(''); }}
             className="search-input"
-            style={{ paddingLeft: '30px' }}
+            style={{ paddingLeft: '12px', paddingRight: '30px' }}
           />
-          <FontAwesomeIcon icon={faSearch} className="search-icon" />
+          <FontAwesomeIcon icon={faSearch} className="search-icon" style={{ right: '10px', left: 'unset', position: 'absolute', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer' }} onClick={handleSearchClick} />
+          {searchError && (
+            <div style={{ color: 'red', fontStyle: 'italic', fontSize: '13px', position: 'absolute', left: 0, top: '110%' }}>
+              {searchError}
+            </div>
+          )}
         </div>
       </div>
       <div className="add-service-btn-row-full">
@@ -422,17 +431,32 @@ const ServicesList = () => {
 
       {showAddForm && <ServicesForm onClose={() => setShowAddForm(false)} onSubmit={handleAddService} />}
       {showEditForm && <ServicesForm onClose={() => setShowEditForm(false)} editingService={editingService} onSubmit={handleEditServiceSubmit} />} 
-    <ConfirmModal 
-      isOpen={showDeleteModal}
+    <ErrorModal
+      isOpen={showErrorModal}
+      title="KHÔNG THỂ XÓA DỊCH VỤ"
+      message={errorModalMessage}
+      onClose={() => setShowErrorModal(false)}
+    />
+    <ErrorModal
+      isOpen={showNotFoundModal}
+      title="KHÔNG TÌM THẤY DỊCH VỤ KHÁM"
+      message={"Không tìm thấy dịch vụ khám phù hợp với tiêu chí. Vui lòng thử lại với tiêu chí khác"}
+      onClose={() => setShowNotFoundModal(false)}
+    />
+    <ConfirmModal
+      isOpen={showConfirmDeleteModal}
       title="XÓA DỊCH VỤ"
       message={
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <CustomWarningIcon />
+          <svg width="50" height="50" viewBox="0 0 24 24" style={{ marginRight: '10px' }}>
+            <path d="M12 2L22 20H2L12 2Z" fill="#FFB636" />
+            <path d="M12 7V13M12 15.5H12.01" stroke="#2B3B47" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+          </svg>
           Bạn có chắc chắn muốn xóa dịch vụ này không?
         </div>
       }
       onConfirm={handleConfirmDelete}
-      onCancel={() => setShowDeleteModal(false)}
+      onCancel={() => setShowConfirmDeleteModal(false)}
     />
       {showDetail && detailService && (
         <ServicesDetail service={detailService} onClose={handleCloseDetail} doctors={doctors} specialties={specialties} />
