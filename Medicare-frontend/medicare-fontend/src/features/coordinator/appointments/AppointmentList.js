@@ -133,10 +133,10 @@ const AppointmentList = () => {
   };
 
   const handleDeleteClick = (appointment) => {
-    const today = dayjs().format('YYYY-MM-DD');
-    const appointmentDate = dayjs(appointment.appointmentDate).format('YYYY-MM-DD');
+    const today = dayjs().startOf('day');
+    const appointmentDate = dayjs(appointment.appointmentDate).startOf('day');
     
-    if (appointmentDate === today) {
+    if (appointmentDate.isSame(today)) {
       setSuccessMessageText("Không thể hủy lịch khám. Vui lòng thử lại sau!");
       setShowSuccessMessage(true);
       setTimeout(() => {
@@ -147,7 +147,7 @@ const AppointmentList = () => {
     }
     
     setAppointmentToDelete(appointment.appointmentId);
-    setShowConfirmModal(true); // Show confirmation modal
+    setShowConfirmModal(true);
   };
 
   const confirmDeleteAppointment = async () => {
@@ -272,20 +272,21 @@ const AppointmentList = () => {
       <Header />
 
       {showSuccessMessage && (
-        <div className="success-toast">
-          {typeof successMessageText === "string" ? (
+        <div className={`success-toast ${successMessageText.includes("Không thể hủy lịch khám") ? 'error' : ''}`}>
+          {typeof successMessageText === 'string' ? (
             <>
               <div className="success-icon-bg">
-                <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-                  <circle cx="19" cy="19" r="19" fill="#32D53B" />
-                  <path
-                    d="M11 20.5L17 26.5L27 14.5"
-                    stroke="white"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                {successMessageText.includes("Không thể hủy lịch khám") ? (
+                  <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+                    <circle cx="19" cy="19" r="19" fill="#FF4D4F"/>
+                    <path d="M24 14L14 24M14 14L24 24" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+                    <circle cx="19" cy="19" r="19" fill="#32D53B"/>
+                    <path d="M11 20.5L17 26.5L27 14.5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
               </div>
               <span>{successMessageText}</span>
             </>
@@ -296,13 +297,13 @@ const AppointmentList = () => {
       )}
 
       {/* Filter and Search */}
-      <div className="filter-section">
-        <div className="filter-checkbox-group">
-          <label htmlFor="status-filter" className="filter-checkbox-label">
+      <div className="appointment-list-filter-section">
+        <div className="appointment-list-filter-checkbox-group">
+          <label htmlFor="status-filter" className="appointment-list-filter-checkbox-label">
             Trạng thái:&nbsp;
             <select
               id="status-filter"
-              className="filter-select"
+              className="appointment-list-filter-select"
               value={filterValue}
               onChange={(e) => setFilterValue(e.target.value)}
             >
@@ -313,10 +314,10 @@ const AppointmentList = () => {
           </label>
         </div>
 
-        <div className="search-box">
+        <div className="appointment-list-search-box">
           <input
             type="text"
-            placeholder="Tìm kiếm lịch khám..."
+            placeholder="Tìm kiếm lịch khám"
             value={searchTerm}
             onChange={handleSearchChange}
           />
@@ -324,7 +325,7 @@ const AppointmentList = () => {
       </div>
 
       {/* Add appointment button */}
-      <div className="add-appointment-button">
+      <div className="appointment-list-add-button">
         <button onClick={() => setOpenForm(true)}>Đặt lịch khám</button>
       </div>
 
@@ -344,7 +345,6 @@ const AppointmentList = () => {
               : "Thêm lịch khám thành công!"
           );
           setShowSuccessMessage(true);
-          // Tự động ẩn thông báo sau 3 giây
           setTimeout(() => {
             setShowSuccessMessage(false);
             setSuccessMessageText("");
@@ -367,13 +367,13 @@ const AppointmentList = () => {
       />
 
       {/* Appointment table */}
-      <div className="appointment-table-wrapper">
+      <div className="appointment-list-table-wrapper">
         {loading ? (
-          <div className="loading">Đang tải...</div>
+          <div className="appointment-list-loading">Đang tải...</div>
         ) : error ? (
-          <div className="error-message">{error}</div>
+          <div className="appointment-list-error-message">{error}</div>
         ) : (
-          <table className="appointment-table">
+          <table className="appointment-list-table">
             <thead>
               <tr>
                 <th>STT</th>
@@ -397,7 +397,6 @@ const AppointmentList = () => {
                     <td>{getServiceNameById(appointment.serviceId)}</td>
                     <td>{getDoctorNameById(appointment.doctorId)}</td>
                     <td>
-                      {/* Tìm thông tin chuyên khoa */}
                       {appointment.serviceId &&
                       services?.length > 0 &&
                       specialties?.length > 0 ? (
@@ -415,11 +414,11 @@ const AppointmentList = () => {
                       {dayjs(appointment.appointmentTime).format("HH:mm:ss")}
                     </td>
                     <td>
-                      <div className="actionbutton">
+                      <div className="appointment-list-action-button">
                         <button
                           key={`view-${appointment.appointmentId}`}
                           onClick={() => handleView(appointment)}
-                          className="view-btn"
+                          className="appointment-list-view-btn"
                           title="Xem chi tiết"
                         >
                           <FaInfoCircle />
@@ -427,7 +426,7 @@ const AppointmentList = () => {
                         <button
                           key={`edit-${appointment.appointmentId}`}
                           onClick={() => handleEdit(appointment)}
-                          className="edit-btn"
+                          className="appointment-list-edit-btn"
                           title="Sửa"
                         >
                           <FaEdit />
@@ -435,7 +434,7 @@ const AppointmentList = () => {
                         <button
                           key={`delete-${appointment.appointmentId}`}
                           onClick={() => handleDeleteClick(appointment)}
-                          className="delete-btn"
+                          className="appointment-list-delete-btn"
                           title="Xoá"
                         >
                           <FaTrash />
@@ -446,7 +445,7 @@ const AppointmentList = () => {
                 ))
               ) : (
                 <tr key="no-data">
-                  <td colSpan="8" className="empty-row">
+                  <td colSpan="8" className="appointment-list-empty-row">
                     Không có dữ liệu
                   </td>
                 </tr>
@@ -457,15 +456,15 @@ const AppointmentList = () => {
       </div>
 
       {/* Pagination */}
-      <div className="pagination-row">
-        <div className="pagination-info">
+      <div className="appointment-list-pagination-row">
+        <div className="appointment-list-pagination-info">
           <span>
             Hiển thị <b>{pagedAppointments.length}</b> bản ghi
           </span>
         </div>
 
-        <div className="pagination-controls">
-          <div className="page-size-selector">
+        <div className="appointment-list-pagination-controls">
+          <div className="appointment-list-page-size-selector">
             <select value={pageSize} onChange={handlePageSizeChange}>
               <option value={5}>5</option>
               <option value={10}>10</option>
@@ -476,17 +475,15 @@ const AppointmentList = () => {
           <button
             disabled={currentPage === 1}
             onClick={() => handlePageChange(currentPage - 1)}
-            className="pagination-btn"
+            className="appointment-list-pagination-btn"
           >
             Trước
           </button>
           {[...Array(totalPages)].map((_, index) => (
-            <button
-              key={index + 1}
-              onClick={() => handlePageChange(index + 1)}
-              className={`pagination-btn ${
-                currentPage === index + 1 ? "active" : ""
-              }`}
+            <button 
+              key={index + 1} 
+              onClick={() => handlePageChange(index + 1)} 
+              className={`appointment-list-pagination-btn ${currentPage === index + 1 ? 'active' : ''}`}
             >
               {index + 1}
             </button>
@@ -494,7 +491,7 @@ const AppointmentList = () => {
           <button
             disabled={currentPage === totalPages}
             onClick={() => handlePageChange(currentPage + 1)}
-            className="pagination-btn"
+            className="appointment-list-pagination-btn"
           >
             Sau
           </button>

@@ -310,7 +310,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
         serviceId: Number(selectedService?.serviceId),
         specialtyId: Number(selectedSpecialty?.specialtyId),
         clinicId: Number(selectedClinic?.clinicId),
-        appointmentDate: appointmentDate ? appointmentDate.toISOString() : "",
+        appointmentDate: appointmentDate ? dayjs(appointmentDate).format('YYYY-MM-DD') : "",
         appointmentTime: appointmentTime
           ? appointmentTime.toISOString().split("T")[1].split(".")[0]
           : "",
@@ -393,16 +393,16 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       />
 
       {open && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
+        <div className="appointment-modal-overlay">
+          <div className="appointment-modal-content">
+            <div className="appointment-modal-header">
               <h2>{appointment ? "SỬA LỊCH KHÁM" : "ĐẶT LỊCH KHÁM"}</h2>
-              <button className="close-btn" onClick={handleCancel}></button>
+              <button className="appointment-close-btn" onClick={handleCancel}></button>
             </div>
 
             {showSuccessMessage && (
-              <div className="error-toast">
-                <div className="error-icon-bg">
+              <div className="appointment-success-message">
+                <div className="appointment-error-icon-bg">
                   <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
                     <circle cx="19" cy="19" r="19" fill="#FF4D4F" />
                     <path
@@ -419,17 +419,17 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
             )}
 
             {isLoadingForm ? (
-              <div className="loading-message">Đang tải dữ liệu, vui lòng chờ...</div>
+              <div className="appointment-loading-message">Đang tải dữ liệu, vui lòng chờ...</div>
             ) : (
               <form className="appointment-form" onSubmit={handleSubmit}>
                 {errors.form && (
-                  <div className="form-error-message">
+                  <div className="appointment-error-message">
                     {errors.form}
                   </div>
                 )}
-                <div className="form-row">
+                <div className="appointment-form-row">
                   {/* Tên dịch vụ khám */}
-                  <div className="form-group" style={{ gridColumn: "1 / -1" }}>
+                  <div className="appointment-form-group" style={{ gridColumn: "1 / -1" }}>
                     <label>
                       Tên dịch vụ khám <span className="required">*</span>
                     </label>
@@ -447,11 +447,11 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
-                    {errors.serviceId && <p className="error">{errors.serviceId}</p>}
+                    {errors.serviceId && <p className="appointment-error-message">{errors.serviceId}</p>}
                   </div>
 
                   {/* Chuyên khoa */}
-                  <div className="form-group">
+                  <div className="appointment-form-group">
                     <label>
                       Chuyên khoa <span className="required">*</span>
                     </label>
@@ -462,24 +462,17 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       required
                     >
                       <option value="">Chọn khoa</option>
-                      {form.specialtyId &&
-                        !specialties.some((s) => String(s.specialtyId) === String(form.specialtyId)) && (
-                          <option value={form.specialtyId} disabled>
-                            Chuyên khoa không hợp lệ ({form.specialtyId})
-                          </option>
-                        )}
                       {specialties.map((s) => (
                         <option key={s.specialtyId} value={String(s.specialtyId)}>
                           {s.specialtyName}
                         </option>
                       ))}
                     </select>
-                    {errors.specialtyId && <p className="error">{errors.specialtyId}</p>}
+                    {errors.specialtyId && <p className="appointment-error-message">{errors.specialtyId}</p>}
                   </div>
 
-
                   {/* Bác sĩ */}
-                  <div className="form-group">
+                  <div className="appointment-form-group">
                     <label>
                       Bác sĩ phụ trách <span className="required">*</span>
                     </label>
@@ -496,11 +489,11 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
-                    {errors.doctorId && <p className="error">{errors.doctorId}</p>}
+                    {errors.doctorId && <p className="appointment-error-message">{errors.doctorId}</p>}
                   </div>
 
                   {/* Tên bệnh nhân */}
-                  <div className="form-group">
+                  <div className="appointment-form-group">
                     <label>
                       Bệnh nhân <span className="required">*</span>
                     </label>
@@ -517,21 +510,21 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
-                    {errors.patientName && <p className="error">{errors.patientName}</p>}
+                    {errors.patientName && <p className="appointment-error-message">{errors.patientName}</p>}
                   </div>
 
                   {/* Ngày khám */}
-                  <div className="form-group">
+                  <div className="appointment-form-group">
                     <label>
                       Ngày khám <span className="required">*</span>
                     </label>
                     <DatePicker
                       selected={appointmentDate}
                       onChange={(date) => {
-                        const today = dayjs().format('YYYY-MM-DD');
-                        const selectedDate = dayjs(date).format('YYYY-MM-DD');
+                        const selectedDate = dayjs(date).startOf('day');
+                        const tomorrow = dayjs().add(1, 'day').startOf('day');
                         
-                        if (selectedDate === today) {
+                        if (selectedDate.isBefore(tomorrow)) {
                           setShowSuccessMessage(true);
                           setSuccessMessageText("Không thể đặt lịch khám trong ngày hiện tại.");
                           setTimeout(() => {
@@ -550,11 +543,11 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       minDate={new Date(dayjs().add(1, 'day').format('YYYY-MM-DD'))}
                       maxDate={new Date(dayjs().add(30, 'day').format('YYYY-MM-DD'))}
                     />
-                    {errors.appointmentDate && <p className="error">{errors.appointmentDate}</p>}
+                    {errors.appointmentDate && <p className="appointment-error-message">{errors.appointmentDate}</p>}
                   </div>
 
                   {/* Giờ khám */}
-                  <div className="form-group">
+                  <div className="appointment-form-group">
                     <label>
                       Giờ khám <span className="required">*</span>
                     </label>
@@ -570,11 +563,11 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       className="form-control"
                       required
                     />
-                    {errors.appointmentTime && <p className="error">{errors.appointmentTime}</p>}
+                    {errors.appointmentTime && <p className="appointment-error-message">{errors.appointmentTime}</p>}
                   </div>
 
                   {/* Phòng khám */}
-                  <div className="form-group">
+                  <div className="appointment-form-group">
                     <label>
                       Phòng khám <span className="required">*</span>
                     </label>
@@ -592,15 +585,15 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
-                    {errors.clinicId && <p className="error">{errors.clinicId}</p>}
+                    {errors.clinicId && <p className="appointment-error-message">{errors.clinicId}</p>}
                   </div>
                 </div>
 
-                <div className="form-actions">
-                  <button type="submit" className="submit-btn">
+                <div className="appointment-form-actions">
+                  <button type="submit" className="appointment-submit-btn">
                     Xác nhận
                   </button>
-                  <button type="button" className="cancel-btn" onClick={handleCancel}>
+                  <button type="button" className="appointment-cancel-btn" onClick={handleCancel}>
                     Hủy bỏ
                   </button>
                 </div>

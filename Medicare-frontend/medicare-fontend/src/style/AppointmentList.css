@@ -1,285 +1,326 @@
-Container tổng
 .appointment-list-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  
-  /* Nội dung chính */
-  .appointment-content {
-    padding: 20px;
-    flex: 1;
-  }
-  
-  /* Header */
-  .appointment-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .appointment-header h2 {
-    margin: 0;
-    color: #333;
-  }
-  
-  /* Nút thêm lịch hẹn */
-  .add-appointment-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 4px;
-    text-decoration: none;
-    transition: background-color 0.3s;
-  }
-  
-  .add-appointment-btn:hover {
-    background-color: #45a049;
-  }
-  
-  /* Bộ lọc */
-  .filter-section {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    margin-bottom: 18px;
-  }
-  
-  .filter-checkbox-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100vw;
-    max-width: 100vw;
-    padding: 0 20px;
-    box-sizing: border-box;
-  }
-  
-  .filter-checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  
-  /* Thanh tìm kiếm */
-  .search-box input[type="text"] {
-    padding: 6px 12px;
-    font-size: 15px;
-    border: 1.5px solid #cfd0d4;
-    border-radius: 6px;
-    outline: none;
-    transition: border-color 0.3s ease;
-    width: 300px;
-    color: #1e429f;
-  }
-  
-  .search-box input[type="text"]::placeholder {
-    color: #7a90c9;
-  }
-  
-  .search-box input[type="text"]:focus {
-    border-color: #153e7e;
-    box-shadow: 0 0 6px rgba(30, 66, 159, 0.3);
-  }
-  
-  /* Bảng danh sách lịch hẹn */
-  .appointment-table-wrapper {
-    width: 100%;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
-  }
-  
-  .appointment-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-  }
-  
-  .appointment-table th {
-    background-color: #1e429f;
-    color: #ffffff;
-    font-weight: 600;
-    padding: 10px 8px;
-    text-align: left;
-  }
-  
-  .appointment-table td {
-    padding: 12px 15px;
-    min-width: 100px;
-    height: 44px;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .appointment-table tr:last-child td {
-    border-bottom: none;
-  }
-  
-  .appointment-table tbody tr:hover {
-    background-color: #f5f5f5;
-  }
-  
-/* Container chứa các button */
-.actionbutton {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  height: 100%;
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
 }
 
-/* Các button chung */
-.actionbutton button {
-  background: none; /* Không có nền */
-  border: none; /* Không có viền */
-  padding: 0; /* Không có padding */
-  cursor: pointer; /* Con trỏ chuột khi hover */
+.appointment-list-filter-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: -20px 0 20px 0;
+  padding: 7px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-list-filter-checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.appointment-list-filter-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.appointment-list-filter-select {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #fff;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.appointment-list-filter-select:focus {
+  border-color: #1D479A;
+}
+
+.appointment-list-search-box {
+  position: relative;
+  width: 300px;
+}
+
+.appointment-list-search-box input {
+  width: 100%;
+  padding: 8px 35px 8px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.appointment-list-search-box input:focus {
+  border-color: #1D479A;
+}
+
+.appointment-list-search-box::before {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  pointer-events: none;
+}
+
+.appointment-list-add-button {
+  margin-bottom: 20px;
+}
+
+.appointment-list-add-button button {
+  padding: 10px 20px;
+  background-color: #1D479A;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.appointment-list-add-button button:hover {
+  background-color: #153e7e;
+}
+
+.appointment-list-table-wrapper {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.appointment-list-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.appointment-list-table th,
+.appointment-list-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.appointment-list-table th {
+  background-color: #1D479A;
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: none;
+}
+
+.appointment-list-table th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.appointment-list-table th:last-child {
+  border-top-right-radius: 8px;
+}
+
+.appointment-list-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.appointment-list-action-button {
+  display: flex;
+  gap: 8px;
+}
+
+.appointment-list-view-btn,
+.appointment-list-edit-btn,
+.appointment-list-delete-btn {
+  padding: 6px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.appointment-list-view-btn {
+  color: #1D479A;
+}
+
+.appointment-list-edit-btn {
+  color: #F6C343;
+}
+
+.appointment-list-delete-btn {
+  color: #E74C3C;
+}
+
+.appointment-list-view-btn:hover,
+.appointment-list-edit-btn:hover,
+.appointment-list-delete-btn:hover {
+  transform: translateY(-1px);
+}
+
+.appointment-list-pagination-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.appointment-list-pagination-info {
+  color: #666;
+  font-size: 14px;
+}
+
+.appointment-list-pagination-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.appointment-list-page-size-selector select {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: #fff;
+  cursor: pointer;
+  outline: none;
+}
+
+.appointment-list-pagination-btn {
+  padding: 6px 12px;
+  margin: 0 4px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.appointment-list-pagination-btn:hover:not(:disabled) {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+.appointment-list-pagination-btn:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.appointment-list-pagination-btn.active {
+  background-color: #1890ff;
+  color: white;
+  border-color: #1890ff;
+}
+
+.appointment-list-pagination-btn.active:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.appointment-list-loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.appointment-list-error-message {
+  text-align: center;
+  padding: 20px;
+  color: #f5222d;
+}
+
+.appointment-list-empty-row {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.success-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+  border: 1px solid #32D53B;
+}
+
+.success-toast.error {
+  border: 1px solid #FF4D4F;
+}
+
+.success-toast span {
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.success-icon-bg {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 36px; /* Đảm bảo chiều rộng cho icon */
-  min-height: 36px; /* Đảm bảo chiều cao cho icon */
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-/* Hiệu ứng hover cho các button */
-.actionbutton button:hover {
-  background: none; /* Không thay đổi nền khi hover */
-  transform: translateY(-1px); /* Hiệu ứng dịch chuyển nhẹ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
 }
 
-/* Màu sắc của các icon */
-.actionbutton .view-btn svg {
-  color: #1e429f; /* Màu của icon "Xem chi tiết" */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
 }
 
-.actionbutton .edit-btn svg {
-  color: #F6C343; /* Màu của icon "Sửa" */
+.appointment-list-current-page {
+  padding: 6px 12px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 0 8px;
 }
-
-.actionbutton .delete-btn svg {
-  color: #E74C3C; /* Màu của icon "Xoá" */
-}
-
-/* Kích thước icon */
-.actionbutton button svg {
-  font-size: 18px; /* Kích thước biểu tượng */
-  transition: color 0.2s ease; /* Hiệu ứng chuyển màu */
-}
-
-
-
-
-  
-  /* Trạng thái */
-  .loading,
-  .error,
-  .no-data {
-    text-align: center;
-    padding: 20px;
-    color: #666;
-  }
-  
-  .error {
-    color: #f44336;
-  }
-  
-  /* Dòng trống khi không có dữ liệu */
-  .empty-row {
-    height: 60px;
-    background-color: #f9f9f9;
-  }
-  
-/* Bộ lọc và thanh tìm kiếm */
-  .filter-section {
-    width: 100%;
-    max-width: 100%;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(29,71,154,0.07);
-    padding: 5px 5px 8px 8px;
-    margin: 0 0 16px 0;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .filter-checkbox-group {
-    display: flex;
-    gap: 15px;
-  }
-  
-  .filter-checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  
-  .filter-checkbox-label input[type="radio"] {
-    accent-color: #007bff; /* màu chính */
-    cursor: pointer;
-    transform: scale(1.2);
-  }
-  
-  .search-box input {
-    padding: 6px 12px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-  }
-
-  
-  .add-appointment-button {
-    margin-bottom: 10px;
-    text-align: left;
-  }
-  
-  .add-appointment-button button {
-    background-color: #1e429f;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    
-  }
-  
-  .add-appointment-button button:hover {
-    background-color: #153e7e;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .add-appointment-button button:active {
-    transform: translateY(0);
-    box-shadow: none;
-  }
-  
-  .filter-select {
-    padding: 7px 16px;
-    border: 1.5px solid #1D479A;
-    border-radius: 6px;
-    font-size: 15px;
-    color: #1D479A;
-    background: #fff;
-    outline: none;
-    transition: border-color 0.2s;
-    margin-left: 6px;
-  }
-
-  .filter-select:focus {
-    border-color: #153c7c;
-  }
-
-  .filter-select option {
-    color: #222;
-  }
-  
   
