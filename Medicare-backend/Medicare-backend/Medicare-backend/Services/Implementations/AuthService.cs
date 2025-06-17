@@ -6,8 +6,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Medicare_backend.Services.Interfaces;
 
-namespace Medicare_backend.Services
+namespace Medicare_backend.Services.Implementations
 {
     public class AuthService : IAuthService
     {

@@ -46,6 +46,9 @@
   margin-top: 10px;
 }
 
+.close-btn {
+  background: none;
+  
 .appointment-close-btn {
   position: absolute;
   right: 20px;
@@ -76,10 +79,6 @@
   height: 2px;
   background-color: currentColor;
   transform: rotate(45deg);
-}
-
-.appointment-close-btn::after {
-  transform: rotate(-45deg);
 }
 
 /* Form chính */

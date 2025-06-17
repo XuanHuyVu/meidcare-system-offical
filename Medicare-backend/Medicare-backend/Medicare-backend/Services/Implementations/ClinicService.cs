@@ -5,8 +5,9 @@ using Medicare_backend.Repositories;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Medicare_backend.Services.Interfaces;
 
-namespace Medicare_backend.Services
+namespace Medicare_backend.Services.Implementations
 {
     public class ClinicService : IClinicService
     {

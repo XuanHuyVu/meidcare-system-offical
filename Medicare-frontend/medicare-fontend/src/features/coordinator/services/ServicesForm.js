@@ -296,7 +296,7 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
     <>
       <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowCancelModal(true)}>
         <div className="modal-container">
-          <div className="modal-header">
+          <div className="service-modal-header">
             <h2>{editingService ? 'SỬA DỊCH VỤ KHÁM' : 'THÊM DỊCH VỤ KHÁM'}</h2>
             <button className="close-btn" onClick={() => setShowCancelModal(true)}>×</button>
           </div>
@@ -334,8 +334,9 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
                   onChange={handleInputChange}
                   className={errors.specialtyId ? 'error' : ''}
                   disabled={loading}
+                  required
                 >
-                  <option value="">-- Chọn chuyên khoa --</option>
+                  <option value="" disabled hidden>-- Chọn chuyên khoa --</option>
                   {specialties.map((spec) => (
                     <option key={spec.specialtyId || spec.id} value={spec.specialtyId || spec.id}>
                       {spec.specialtyName || spec.name}
@@ -352,8 +353,9 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
                   value={formData.doctorId || ""}
                   onChange={handleInputChange}
                   className={errors.doctorId ? 'error' : ''}
+                  required
                 >
-                  <option key="default" value="">Chọn bác sĩ</option>
+                  <option key="default" value="" disabled hidden>--Chọn bác sĩ--</option>
                   {doctors.map((doctor) => (
                     <option key={doctor.doctorId} value={doctor.doctorId}>
                       {doctor.fullName}
@@ -411,22 +413,16 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
             </div>
             <div className="form-group image-upload-container">
               <label>Ảnh minh họa:</label>
-              <div className="image-upload-area">
-                {formData.image ? (
-                  <div className="image-preview-section">
-                    <img src={formData.image} alt="preview" className="preview-image" />
-                    <div className="change-placeholder">Thay đổi ảnh minh họa<br/>PNG, JPG, GIF</div>
-                    <label htmlFor="image-upload-input" className="change-image-btn" style={{ cursor: 'pointer', color: '#1D479A', textDecoration: 'underline', marginTop: 8, display: 'inline-block' }}>
-                      Chọn lại ảnh
-                    </label>
-                  </div>
-                ) : (
-                  <label htmlFor="image-upload-input" className="upload-placeholder" style={{ cursor: 'pointer' }}>
-                    <svg width="32" height="32" fill="none" stroke="#1D479A" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 16V4M8 8l4-4 4 4"/><rect x="4" y="16" width="16" height="4" rx="2"/></svg>
-                    <p>Nhấp để chọn ảnh hoặc kéo thả tại đây</p>
-                    <span>PNG, JPG, GIF</span>
-                  </label>
+              <div className="image-upload-area image-upload-vertical">
+                {formData.image && (
+                  <img src={formData.image} alt="preview" className="preview-image" />
                 )}
+                <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 16l-4-4-4 4"/><path d="M12 12v9"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 104 16.3"/></svg>
+                <div className="change-placeholder">Thay đổi ảnh minh họa</div>
+                <span>PNG, JPG, GIF</span>
+                <span className="change-image-btn" style={{ cursor: 'pointer', color: '#1D479A', textDecoration: 'underline', marginTop: 8, display: 'inline-block' }}>
+                  Chọn lại ảnh
+                </span>
                 <input
                   type="file"
                   accept="image/png, image/jpg, image/jpeg, image/gif"
@@ -436,7 +432,7 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
                 />
               </div>
               {formData.imageName && (
-                <div className="file-info success" style={{background: '#e6f9f0', color: '#222', display: 'flex', alignItems: 'center', borderRadius: 8, padding: '8px 12px', marginTop: 8, boxShadow: '0 0 4px #0db52022'}}>
+                <div className="file-info success">
                   <i className="fa-regular fa-image" style={{color: '#0db520', fontSize: 20, marginRight: 8}}></i>
                   <span style={{flex: 1}}>{formData.imageName}</span>
                   <button type="button" className="remove-file-btn" style={{color: '#e74c3c', fontSize: 22, background: 'none', border: 'none', cursor: 'pointer'}} onClick={handleRemoveImage}>&times;</button>
