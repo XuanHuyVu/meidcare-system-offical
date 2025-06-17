@@ -1,8 +1,91 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../../../style/AppointmentDetail.css";
 import dayjs from "dayjs";
 
-const AppointmentDetail = ({ open, onClose, appointment }) => {
+const AppointmentDetail = ({ open, onClose, appointment, patients, doctors, specialties, clinics, services }) => {
+  const [patientName, setPatientName] = useState("");
+  const [doctorName, setDoctorName] = useState("");
+  const [specialtyName, setSpecialtyName] = useState("");
+  const [clinicName, setClinicName] = useState("");
+  const [serviceName, setServiceName] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Dùng useEffect để tìm kiếm thông tin liên quan từ các ID
+  useEffect(() => {
+    if (!open || !appointment) return;
+    
+    setIsLoading(true);
+    
+    try {
+      console.log("Appointment data:", appointment);
+      console.log("Patients data:", patients);
+      console.log("Doctors data:", doctors);
+      console.log("Specialties data:", specialties);
+      console.log("Clinics data:", clinics);
+      console.log("Services data:", services);
+
+      // Tìm thông tin bệnh nhân
+      if (appointment.patientId && patients?.length > 0) {
+        const patient = patients.find(p => String(p.patientId) === String(appointment.patientId));
+        console.log("Found patient:", patient);
+        setPatientName(patient?.fullName || "Không xác định");
+      } else {
+        setPatientName("Không xác định");
+      }
+
+      // Tìm thông tin bác sĩ
+      if (appointment.doctorId && doctors?.length > 0) {
+        const doctor = doctors.find(d => String(d.doctorId) === String(appointment.doctorId));
+        console.log("Found doctor:", doctor);
+        setDoctorName(doctor?.fullName || "Không xác định");
+      } else {
+        setDoctorName("Không xác định");
+      }
+
+      // Tìm thông tin chuyên khoa qua serviceId
+      if (appointment.serviceId && services?.length > 0 && specialties?.length > 0) {
+        const service = services.find(s => String(s.serviceId) === String(appointment.serviceId));
+        if (service) {
+          const specialty = specialties.find(sp => String(sp.specialtyId) === String(service.specialtyId));
+          setSpecialtyName(specialty?.specialtyName || "Không xác định");
+        } else {
+          setSpecialtyName("Không xác định");
+        }
+      } else {
+        setSpecialtyName("Không xác định");
+      }
+
+      // Tìm thông tin phòng khám
+      if (appointment.clinicId && clinics?.length > 0) {
+        const clinic = clinics.find(c => String(c.clinicId) === String(appointment.clinicId));
+        console.log("Found clinic:", clinic);
+        setClinicName(clinic?.clinicName || "Không xác định");
+      } else {
+        setClinicName("Không xác định");
+      }
+
+      // Tìm thông tin dịch vụ
+      if (appointment.serviceId && services?.length > 0) {
+        const service = services.find(s => String(s.serviceId) === String(appointment.serviceId));
+        console.log("Found service:", service);
+        setServiceName(service?.serviceName || "Không xác định");
+      } else {
+        setServiceName("Không xác định");
+      }
+    } catch (error) {
+      console.error("Error loading appointment details:", error);
+      // Set default values in case of error
+      setPatientName("Không xác định");
+      setDoctorName("Không xác định");
+      setSpecialtyName("Không xác định");
+      setClinicName("Không xác định");
+      setServiceName("Không xác định");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [appointment, patients, doctors, specialties, clinics, services, open]);
+
+  // Kiểm tra nếu không mở modal hoặc không có lịch hẹn
   if (!open || !appointment) return null;
 
   // Kết hợp date và time thành một ngày giờ đầy đủ
@@ -29,26 +112,25 @@ const AppointmentDetail = ({ open, onClose, appointment }) => {
           }}
         >
           <div>
-            <b>Tên bệnh nhân:</b> {appointment.patientName}
+            <b>Tên bệnh nhân:</b> {isLoading ? "Đang tải..." : patientName}
           </div>
           <div>
-            <b>Ngày sinh:</b>{" "}
-            {dayjs(appointment.dateOfBirth).format("DD-MM-YYYY")}
+            <b>Ngày sinh:</b> {dayjs(appointment.dateOfBirth).format("DD-MM-YYYY")}
           </div>
           <div>
-            <b>Khoa khám:</b> {appointment.specialtyName}
+            <b>Khoa khám:</b> {isLoading ? "Đang tải..." : specialtyName}
           </div>
           <div>
-            <b>Bác sĩ:</b> {appointment.doctorName}
+            <b>Bác sĩ:</b> {isLoading ? "Đang tải..." : doctorName}
           </div>
           <div>
             <b>Thời gian:</b> {fullDateTime}
           </div>
           <div>
-            <b>Phòng khám:</b> {appointment.clinicName}
+            <b>Phòng khám:</b> {isLoading ? "Đang tải..." : clinicName}
           </div>
           <div>
-            <b>Dịch vụ:</b> {appointment.serviceName}
+            <b>Dịch vụ:</b> {isLoading ? "Đang tải..." : serviceName}
           </div>
           <div>
             <b>Trạng thái:</b>{" "}

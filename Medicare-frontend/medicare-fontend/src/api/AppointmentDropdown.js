@@ -9,8 +9,7 @@ import axiosInstance from "./axiosInstance";
 //export const GetServicesAsync = () => axiosInstance.get("/coordinator/services");
 
 // API cho Specialties
-export const GetSpecialtiesAsync = () =>
-  axiosInstance.get("/coordinator/specialties");
+export const GetSpecialtiesAsync = () => axiosInstance.get("/coordinator/specialties");
 
 // API cho Doctors
 export const GetDoctorsAsync = () => axiosInstance.get("/coordinator/doctors");
@@ -19,8 +18,7 @@ export const GetDoctorsAsync = () => axiosInstance.get("/coordinator/doctors");
 export const GetClinicsAsync = () => axiosInstance.get("/coordinator/clinics");
 
 // API cho Services
-export const GetServicesAsync = () =>
-  axiosInstance.get("/coordinator/services");
+export const GetServicesAsync = () => axiosInstance.get("/coordinator/services");
 
 // API kiểm tra sự tồn tại của bệnh nhân
 export const CheckPatientExistence = async (patientName) => {
@@ -36,5 +34,4 @@ export const CheckPatientExistence = async (patientName) => {
 };
 
 // API cho Patients
-export const GetPatientsAsync = () =>
-  axiosInstance.get("/coordinator/patients");
+export const GetPatientsAsync = () => axiosInstance.get("/coordinator/patients");
