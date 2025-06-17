@@ -13,7 +13,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Medicare_backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+<<<<<<< Updated upstream
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cf9c8d0ddb087c8dccb430bb3650b0f8af9761c3")]
+=======
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7d127e3e4b0b40205ba30e75a1c9187561608761")]
+>>>>>>> Stashed changes
 [assembly: System.Reflection.AssemblyProductAttribute("Medicare_backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Medicare_backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Medicare_backend.Services
+namespace Medicare_backend.Services.Interfaces
 {
     public interface IWorkScheduleService
     {

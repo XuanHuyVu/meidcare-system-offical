@@ -27,10 +27,10 @@
 }
 
 /* Modal Header */
-.modal-header {
+.service-modal-header {
   background: #1D479A;
   color: #fff;
-  padding: 16px 24px;
+  padding: 10px 20px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -38,8 +38,9 @@
   border: 3px solid #1D479A;
   border-bottom: none;
   font-weight: 400;
-  font-size: 16px;
-  margin-bottom: 6px;
+  font-size: 15px;
+  margin-bottom: 0;
+  min-height: 40px;
 }
 
 .close-btn {
@@ -49,36 +50,44 @@
   border: none;
   cursor: pointer;
   padding: 8px;
-  font-size: 20px; /* Increase size */
+  font-size: 20px;
 }
 
-.modal-header h2 {
+.service-modal-header h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #fff;
   text-align: left;
-  padding-left: 24px;
+  padding-left: 12px;
 }
 
 /* Form Styles */
 .services-form {
-  padding: 12px 24px 24px 24px;
+  padding: 6px 20px 16px 20px;
 }
 
-.form-group {
-  margin-bottom: 16px;
+.services-form .form-group {
+  margin-bottom: 14px;
+  margin-top: 0;
 }
 
-.form-group label {
-  margin-bottom: 4px;
+.services-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.services-form .form-group label {
+  margin-bottom: 2px;
+  margin-top: 0;
+  display: block;
   font-size: 14px;
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+.services-form .form-group:last-child {
+  margin-bottom: 0;
 }
 
 .form-group input,
@@ -125,22 +134,38 @@
 
 /* Image Upload */
 .image-upload-container {
-  margin-top: 8px;
+  margin-top: 0;
+  padding-top: 0;
+  width: 100%;
 }
 
 .image-upload-area {
-  display: block;
-  border: 2px dashed #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  background: #fafbfc;
+  border: 1.5px dashed #bbb;
+  border-radius: 12px;
+  min-height: 180px;
+  height: auto;
+  width: 100%;
+  max-width: 700px;
+  min-width: 340px;
+  padding: 24px 32px 16px 32px;
+  gap: 14px;
+  margin-left: 0;
+  box-sizing: border-box;
 }
 
 .upload-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 100%;
 }
 
 .upload-placeholder svg {
@@ -218,16 +243,17 @@
     gap: 12px;
   }
 
-  .modal-header {
-    padding: 16px 20px;
+  .service-modal-header {
+    padding: 10px 12px;
   }
 
-  .modal-header h2 {
-    font-size: 16px;
+  .service-modal-header h2 {
+    font-size: 17px;
+    padding-left: 8px;
   }
 
   .services-form {
-    padding: 20px;
+    padding: 10px;
   }
 
   .form-actions {
@@ -239,6 +265,11 @@
   .cancel-btn {
     width: 100%;
   }
+
+  .image-upload-area {
+    min-width: 180px;
+    min-height: 60px;
+  }
 }
 
 .preview-image {
@@ -249,4 +280,210 @@
   border: 1px solid #e0e0e0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   margin-bottom: 10px;
+}
+
+.services-form .form-group:first-child {
+  margin-top: 0 !important;
+}
+
+.services-form input[type="text"],
+.services-form select,
+.services-form textarea {
+  height: 40px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+.services-form select {
+  color: #222;
+}
+
+.services-form select option[value=""] {
+  color: #aaa !important;
+}
+
+.services-form select:invalid {
+  color: #aaa;
+}
+
+.services-form select:required:invalid {
+  color: #aaa !important;
+}
+
+.image-upload-area.has-image {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 24px;
+  background: #fafbfc;
+  border: 1.5px dashed #bbb;
+  min-height: 140px;
+  padding: 16px 20px;
+}
+
+.image-preview-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  margin-right: 16px;
+  height: 100%;
+}
+
+.preview-image {
+  width: 140px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 0;
+}
+
+.upload-placeholder {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 220px;
+  min-width: 180px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.file-info {
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  background: #e6f9f0;
+  color: #222;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 0 4px #0db52022;
+  font-size: 15px;
+}
+
+.remove-file-btn {
+  color: #e74c3c;
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.change-placeholder, .change-image-btn {
+  text-align: left;
+  margin-left: 0;
+}
+
+.image-upload-flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.image-upload-area-only-dashed {
+  border: 1.5px dashed #bbb;
+  background: #fafbfc;
+  min-height: 140px;
+  min-width: 220px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-preview-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  margin-right: 0;
+  height: 100%;
+}
+
+.preview-image {
+  width: 140px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 0;
+}
+
+.image-upload-area.image-upload-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fafbfc;
+  border: 1.5px dashed #bbb;
+  border-radius: 12px;
+  min-height: 320px;
+  width: 100%;
+  max-width: 420px;
+  padding: 28px 24px 18px 24px;
+  gap: 14px;
+  margin-left: 0;
+}
+
+.preview-image {
+  width: 180px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 0;
+}
+
+.change-placeholder, .change-image-btn, .upload-placeholder, .image-upload-area.image-upload-vertical > span {
+  text-align: center;
+  width: 100%;
+}
+
+.image-upload-area-only-dashed {
+  border: none;
+  background: transparent;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.upload-placeholder {
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.file-info {
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  background: #e6f9f0;
+  color: #222;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 0 4px #0db52022;
+  font-size: 15px;
 }

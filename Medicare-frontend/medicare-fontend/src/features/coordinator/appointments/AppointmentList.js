@@ -3,6 +3,13 @@ import {
   getAppointments,
   deleteAppointment,
 } from "../../../api/AppointmentApi";
+import {
+  GetPatientsAsync,
+  GetDoctorsAsync,
+  GetServicesAsync,
+  GetClinicsAsync,
+  GetSpecialtiesAsync,
+} from "../../../api/AppointmentDropdown";
 import Header from "../../../components/Header";
 import AppointmentForm from "./AppointmentForm";
 import AppointmentDetail from "./AppointmentDetail";
@@ -13,8 +20,16 @@ import { FaInfoCircle, FaEdit, FaTrash } from "react-icons/fa";
 
 const AppointmentList = () => {
   const [appointments, setAppointments] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [services, setServices] = useState([]);
+  const [clinics, setClinics] = useState([]);
+  const [specialties, setSpecialties] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successMessageText, setSuccessMessageText] = useState("");
 
   const [filterValue, setFilterValue] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,8 +43,18 @@ const AppointmentList = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [appointmentToDelete, setAppointmentToDelete] = useState(null);
 
+<<<<<<< Updated upstream
+=======
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+>>>>>>> Stashed changes
   useEffect(() => {
     fetchAppointments();
+    fetchAdditionalData(); // Load additional data like patients, doctors, etc.
   }, []);
 
   const fetchAppointments = async () => {
@@ -55,6 +80,27 @@ const AppointmentList = () => {
     }
   };
 
+  // Fetch additional data
+  const fetchAdditionalData = async () => {
+    try {
+      const [patientsRes, doctorsRes, servicesRes, clinicsRes, specialtiesRes] =
+        await Promise.all([
+          GetPatientsAsync(),
+          GetDoctorsAsync(),
+          GetServicesAsync(),
+          GetClinicsAsync(),
+          GetSpecialtiesAsync(),
+        ]);
+      setPatients(patientsRes.data || []);
+      setDoctors(doctorsRes.data || []);
+      setServices(servicesRes.data || []);
+      setClinics(clinicsRes.data || []);
+      setSpecialties(specialtiesRes.data || []);
+    } catch (err) {
+      console.error("Error fetching additional data:", err);
+    }
+  };
+
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -70,11 +116,11 @@ const AppointmentList = () => {
 
     const keyword = searchTerm.toLowerCase();
     const matchSearch =
-      appointment.patientName?.toLowerCase().includes(keyword) ||
-      appointment.roomName?.toLowerCase().includes(keyword) ||
-      appointment.serviceName?.toLowerCase().includes(keyword) ||
-      appointment.doctorName?.toLowerCase().includes(keyword) ||
-      appointment.specialty?.toLowerCase().includes(keyword);
+      appointment.patientId?.toString().includes(keyword) ||
+      appointment.clinicId?.toString().includes(keyword) ||
+      appointment.serviceId?.toString().includes(keyword) ||
+      appointment.specialtyId?.toString().includes(keyword) ||
+      appointment.doctorId?.toString().includes(keyword);
 
     return matchFilter && matchSearch;
   });
@@ -90,56 +136,190 @@ const AppointmentList = () => {
   };
 
   const handleDeleteClick = (appointment) => {
+<<<<<<< Updated upstream
     // Save the appointment ID to be deleted
     setAppointmentToDelete(appointment.appointmentId);
     setShowConfirmModal(true); // Show confirmation modal
+=======
+    const today = dayjs().startOf('day');
+    const appointmentDate = dayjs(appointment.appointmentDate).startOf('day');
+    
+    if (appointmentDate.isSame(today)) {
+      setSuccessMessageText("Không thể hủy lịch khám. Vui lòng thử lại sau!");
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        setSuccessMessageText("");
+      }, 3000);
+      return;
+    }
+    
+    setAppointmentToDelete(appointment.appointmentId);
+    setShowConfirmModal(true);
+>>>>>>> Stashed changes
   };
 
   const confirmDeleteAppointment = async () => {
     if (appointmentToDelete) {
       try {
-        console.log("Deleting appointment with ID:", appointmentToDelete); // Check ID of the appointment
+        console.log("Deleting appointment with ID:", appointmentToDelete);
 
         // Call API to delete the appointment
         const response = await deleteAppointment(appointmentToDelete);
 
         if (response.status === 204 || response.status === 200) {
           console.log("Appointment deleted successfully!");
-          alert("Xóa lịch hẹn thành công!"); // Success message
-          await fetchAppointments(); // Reload the appointments list after deletion
+          setSuccessMessageText("Xóa lịch khám thành công!");
+          setShowSuccessMessage(true);
+          // Tự động ẩn thông báo sau 3 giây
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            setSuccessMessageText("");
+          }, 3000);
+          await fetchAppointments();
         } else {
           console.error("Failed to delete appointment:", response);
-          alert("Xóa lịch hẹn không thành công!"); // Failure message
+          setSuccessMessageText("Xóa lịch khám không thành công!");
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            setSuccessMessageText("");
+          }, 3000);
         }
       } catch (err) {
         console.error("Error deleting appointment:", err);
-        alert("Đã xảy ra lỗi khi xóa lịch hẹn. Vui lòng thử lại!"); // Error message
+        setSuccessMessageText(
+          "Đã xảy ra lỗi khi xóa lịch khám. Vui lòng thử lại!"
+        );
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+          setSuccessMessageText("");
+        }, 3000);
       } finally {
-        setShowConfirmModal(false); // Close confirmation modal
-        setAppointmentToDelete(null); // Reset appointment ID
+        setShowConfirmModal(false);
+        setAppointmentToDelete(null);
       }
     } else {
-      alert("Không có ID hợp lệ để xóa lịch hẹn!");
+      setSuccessMessageText("Không có ID hợp lệ để xóa lịch khám!");
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        setSuccessMessageText("");
+      }, 3000);
     }
   };
+<<<<<<< Updated upstream
 
   const handleCancelDelete = () => {
     setShowConfirmModal(false); // Close confirmation modal without deleting
     setAppointmentToDelete(null); // Reset appointment ID
+=======
+
+  const handleCancelDelete = () => {
+    setShowConfirmModal(false);
+    setAppointmentToDelete(null);
+  };
+
+  const getPatientNameById = (id) => {
+    const patient = patients.find((p) => p.patientId === id);
+    return patient ? patient.fullName : "";
+  };
+
+  const getDoctorNameById = (id) => {
+    const doctor = doctors.find((d) => d.doctorId === id);
+    return doctor ? doctor.fullName : "";
+  };
+
+  const getServiceNameById = (id) => {
+    const service = services.find((s) => s.serviceId === id);
+    return service ? service.serviceName : "";
+  };
+
+  const getClinicNameById = (id) => {
+    const clinic = clinics.find((c) => c.clinicId === id);
+    return clinic ? clinic.clinicName : "";
+  };
+
+  const getSpecialtyNameByServiceId = (serviceId) => {
+    const service = services.find((s) => s.serviceId === serviceId);
+    if (!service) return "";
+    const specialty = specialties.find(
+      (sp) => sp.specialtyId === service.specialtyId
+    );
+    return specialty ? specialty.specialtyName : "";
+  };
+
+  const CustomWarningIcon = () => (
+    <svg
+      width="50"
+      height="50"
+      viewBox="0 0 24 24"
+      style={{ marginRight: "10px" }}
+    >
+      <path d="M12 2L22 20H2L12 2Z" fill="#FFB636" />
+      <path
+        d="M12 7V13M12 15.5H12.01"
+        stroke="#2B3B47"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, filteredAppointments.length);
+
+  const pagedAppointments = filteredAppointments.slice(startIndex, endIndex);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handlePageSizeChange = (e) => {
+    setPageSize(Number(e.target.value));
+    setCurrentPage(1);
+>>>>>>> Stashed changes
   };
 
   return (
     <div className="appointment-list-container">
       <Header />
 
+      {showSuccessMessage && (
+        <div className={`success-toast ${successMessageText.includes("Không thể hủy lịch khám") ? 'error' : ''}`}>
+          {typeof successMessageText === 'string' ? (
+            <>
+              <div className="success-icon-bg">
+                {successMessageText.includes("Không thể hủy lịch khám") ? (
+                  <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+                    <circle cx="19" cy="19" r="19" fill="#FF4D4F"/>
+                    <path d="M24 14L14 24M14 14L24 24" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+                    <circle cx="19" cy="19" r="19" fill="#32D53B"/>
+                    <path d="M11 20.5L17 26.5L27 14.5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+              <span>{successMessageText}</span>
+            </>
+          ) : (
+            successMessageText
+          )}
+        </div>
+      )}
+
       {/* Filter and Search */}
-      <div className="filter-section">
-        <div className="filter-checkbox-group">
-          <label htmlFor="status-filter" className="filter-checkbox-label">
+      <div className="appointment-list-filter-section">
+        <div className="appointment-list-filter-checkbox-group">
+          <label htmlFor="status-filter" className="appointment-list-filter-checkbox-label">
             Trạng thái:&nbsp;
             <select
               id="status-filter"
-              className="filter-select"
+              className="appointment-list-filter-select"
               value={filterValue}
               onChange={(e) => setFilterValue(e.target.value)}
             >
@@ -150,10 +330,10 @@ const AppointmentList = () => {
           </label>
         </div>
 
-        <div className="search-box">
+        <div className="appointment-list-search-box">
           <input
             type="text"
-            placeholder="Tìm kiếm lịch khám..."
+            placeholder="Tìm kiếm lịch khám"
             value={searchTerm}
             onChange={handleSearchChange}
           />
@@ -161,7 +341,7 @@ const AppointmentList = () => {
       </div>
 
       {/* Add appointment button */}
-      <div className="add-appointment-button">
+      <div className="appointment-list-add-button">
         <button onClick={() => setOpenForm(true)}>Đặt lịch khám</button>
       </div>
 
@@ -175,7 +355,17 @@ const AppointmentList = () => {
         onSubmit={() => {
           setOpenForm(false);
           setEditingAppointment(null);
-          fetchAppointments(); // Refresh the appointments list after submit
+          setSuccessMessageText(
+            editingAppointment
+              ? "Sửa lịch khám thành công!"
+              : "Thêm lịch khám thành công!"
+          );
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            setSuccessMessageText("");
+          }, 3000);
+          fetchAppointments();
         }}
         appointment={editingAppointment}
       />
@@ -185,16 +375,21 @@ const AppointmentList = () => {
         open={openDetail}
         onClose={() => setOpenDetail(false)}
         appointment={detailAppointment}
+        patients={patients}
+        doctors={doctors}
+        specialties={specialties}
+        clinics={clinics}
+        services={services}
       />
 
       {/* Appointment table */}
-      <div className="appointment-table-wrapper">
+      <div className="appointment-list-table-wrapper">
         {loading ? (
-          <div className="loading">Đang tải...</div>
+          <div className="appointment-list-loading">Đang tải...</div>
         ) : error ? (
-          <div className="error-message">{error}</div>
+          <div className="appointment-list-error-message">{error}</div>
         ) : (
-          <table className="appointment-table">
+          <table className="appointment-list-table">
             <thead>
               <tr>
                 <th>STT</th>
@@ -209,15 +404,25 @@ const AppointmentList = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredAppointments.length > 0 ? (
-                filteredAppointments.map((appointment, index) => (
+              {pagedAppointments.length > 0 ? (
+                pagedAppointments.map((appointment, index) => (
                   <tr key={appointment.appointmentId}>
                     <td>{index + 1}</td>
-                    <td>{appointment.patientName}</td>
-                    <td>{appointment.clinicName}</td>
-                    <td>{appointment.serviceName}</td>
-                    <td>{appointment.doctorName}</td>
-                    <td>{appointment.specialtyName}</td>
+                    <td>{getPatientNameById(appointment.patientId)}</td>
+                    <td>{getClinicNameById(appointment.clinicId)}</td>
+                    <td>{getServiceNameById(appointment.serviceId)}</td>
+                    <td>{getDoctorNameById(appointment.doctorId)}</td>
+                    <td>
+                      {appointment.serviceId &&
+                      services?.length > 0 &&
+                      specialties?.length > 0 ? (
+                        <div>
+                          {getSpecialtyNameByServiceId(appointment.serviceId)}
+                        </div>
+                      ) : (
+                        <div>Không xác định</div>
+                      )}
+                    </td>
                     <td>
                       {dayjs(appointment.appointmentDate).format("YYYY-MM-DD")}
                     </td>
@@ -225,11 +430,11 @@ const AppointmentList = () => {
                       {dayjs(appointment.appointmentTime).format("HH:mm:ss")}
                     </td>
                     <td>
-                      <div className="actionbutton">
+                      <div className="appointment-list-action-button">
                         <button
                           key={`view-${appointment.appointmentId}`}
                           onClick={() => handleView(appointment)}
-                          className="view-btn"
+                          className="appointment-list-view-btn"
                           title="Xem chi tiết"
                         >
                           <FaInfoCircle />
@@ -237,7 +442,7 @@ const AppointmentList = () => {
                         <button
                           key={`edit-${appointment.appointmentId}`}
                           onClick={() => handleEdit(appointment)}
-                          className="edit-btn"
+                          className="appointment-list-edit-btn"
                           title="Sửa"
                         >
                           <FaEdit />
@@ -245,7 +450,7 @@ const AppointmentList = () => {
                         <button
                           key={`delete-${appointment.appointmentId}`}
                           onClick={() => handleDeleteClick(appointment)}
-                          className="delete-btn"
+                          className="appointment-list-delete-btn"
                           title="Xoá"
                         >
                           <FaTrash />
@@ -256,7 +461,7 @@ const AppointmentList = () => {
                 ))
               ) : (
                 <tr key="no-data">
-                  <td colSpan="8" className="empty-row">
+                  <td colSpan="8" className="appointment-list-empty-row">
                     Không có dữ liệu
                   </td>
                 </tr>
@@ -266,11 +471,66 @@ const AppointmentList = () => {
         )}
       </div>
 
+<<<<<<< Updated upstream
       {/* Confirmation modal for deleting */}
       <ConfirmModal
         isOpen={showConfirmModal}
         title="Xác nhận xóa"
         message="Bạn có chắc chắn muốn xóa lịch hẹn này?"
+=======
+      {/* Pagination */}
+      <div className="appointment-list-pagination-row">
+        <div className="appointment-list-pagination-info">
+          <span>
+            Hiển thị <b>{pagedAppointments.length}</b> bản ghi
+          </span>
+        </div>
+
+        <div className="appointment-list-pagination-controls">
+          <div className="appointment-list-page-size-selector">
+            <select value={pageSize} onChange={handlePageSizeChange}>
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+          <button
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+            className="appointment-list-pagination-btn"
+          >
+            Trước
+          </button>
+          {[...Array(totalPages)].map((_, index) => (
+            <button 
+              key={index + 1} 
+              onClick={() => handlePageChange(index + 1)} 
+              className={`appointment-list-pagination-btn ${currentPage === index + 1 ? 'active' : ''}`}
+            >
+              {index + 1}
+            </button>
+          ))}
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+            className="appointment-list-pagination-btn"
+          >
+            Sau
+          </button>
+        </div>
+      </div>
+
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title="XÓA LỊCH HẸN"
+        message={
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <CustomWarningIcon />
+            Bạn có chắc chắn muốn xóa lịch hẹn này không?
+          </div>
+        }
+>>>>>>> Stashed changes
         onConfirm={confirmDeleteAppointment}
         onCancel={handleCancelDelete}
       />

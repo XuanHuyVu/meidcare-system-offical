@@ -1,6 +1,6 @@
 ﻿using Medicare_backend.DTOs;
 
-namespace Medicare_backend.Services
+namespace Medicare_backend.Services.Interfaces
 {
     public interface IAppointmentService
     {

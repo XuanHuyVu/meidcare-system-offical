@@ -1,9 +1,10 @@
 ﻿using Medicare_backend.DTOs;
-using Medicare_backend.Services;
+using Medicare_backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Medicare_backend.Models;
 
 namespace Medicare_backend.Controllers.Coordinator
 {
@@ -18,38 +19,35 @@ namespace Medicare_backend.Controllers.Coordinator
             _serviceService = serviceService;
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ServiceDto>>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var services = await _serviceService.GetAllAsync();
-            return Ok(services);
+            var result = await _serviceService.GetAllServicesAsync();
+            return Ok(result);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<ServiceDto>> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var service = await _serviceService.GetByIdAsync(id);
-            if (service == null) return NotFound();
-            return Ok(service);
+            var result = await _serviceService.GetServiceByIdAsync(id);
+            if (result == null) return NotFound();
+            return Ok(result);
         }
         [HttpPost]
-        public async Task<ActionResult<ServiceDto>> Create(ServiceDto dto)
+        public async Task<IActionResult> Create([FromBody] Service service)
         {
-            var created = await _serviceService.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = created.ServiceId }, created);
+            var result = await _serviceService.CreateServiceAsync(service);
+            return CreatedAtAction(nameof(GetById), new { id = result.ServiceId }, result);
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, ServiceDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] Service service)
         {
-            if (id != dto.ServiceId)
-                return BadRequest("ID không khớp");
-            var updated = await _serviceService.UpdateAsync(id, dto);
-            if (!updated) return NotFound();
-            return NoContent();
+            if (id != service.ServiceId) return BadRequest();
+            var result = await _serviceService.UpdateServiceAsync(service);
+            return Ok(result);
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _serviceService.DeleteAsync(id);
-            if (!deleted) return NotFound();
+            await _serviceService.DeleteServiceAsync(id);
             return NoContent();
         }
     }
