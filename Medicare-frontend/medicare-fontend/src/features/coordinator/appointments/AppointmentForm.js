@@ -303,6 +303,14 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
         (p) => String(p.patientId) === String(form.patientId)
       );
 
+      const formatTime = (dateObj) => {
+        if (!dateObj) return "";
+        const hours = dateObj.getHours().toString().padStart(2, "0");
+        const minutes = dateObj.getMinutes().toString().padStart(2, "0");
+        return `${hours}:${minutes}:00`;
+      };
+
+
       const submissionData = {
         patientId: Number(form.patientId),
         dateOfBirth: selectedPatient?.dateOfBirth || "",
@@ -311,9 +319,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
         specialtyId: Number(selectedSpecialty?.specialtyId),
         clinicId: Number(selectedClinic?.clinicId),
         appointmentDate: appointmentDate ? dayjs(appointmentDate).format('YYYY-MM-DD') : "",
-        appointmentTime: appointmentTime
-          ? appointmentTime.toISOString().split("T")[1].split(".")[0]
-          : "",
+        appointmentTime: formatTime(appointmentTime)
       };
 
       // Nếu đang sửa lịch khám, thêm appointmentId vào dữ liệu
