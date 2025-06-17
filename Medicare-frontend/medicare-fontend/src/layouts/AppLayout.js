@@ -5,10 +5,11 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import '../style/Layout.css';
 import Dashboard from '../features/coordinator/dashboard/Dashboard';
+import DoctorList from '../features/coordinator/doctors/DoctorList';
 import ServicesList from '../features/coordinator/services/ServicesList';
 import WorkSchedulesList from '../features/coordinator/workschedules/WorkSchedulesList';
 import AppointmentList from '../features/coordinator/appointments/AppointmentList';
-
+import PatientsList from '../features/coordinator/patients/PatientsList';
 function AppLayout() {
   const location = useLocation();
 
@@ -20,9 +21,11 @@ function AppLayout() {
         <div className="content-area">
           <Routes>
             <Route path="/*" element={<Dashboard />} />
+            <Route path="/doctors" element={<DoctorList />} />
             <Route path="/workschedules" element={<WorkSchedulesList />} />
             <Route path="/services" element={<ServicesList />} />
             <Route path="/appointments" element={<AppointmentList />} />
+            <Route path="/patients" element={<PatientsList />} />
           </Routes>
         </div>
         {location.pathname !== '/' && <Footer />}

@@ -37,10 +37,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-<<<<<<< Updated upstream
-  height: 60px;
-=======
->>>>>>> Stashed changes
 }
 
 .appointment-modal-header h2 {
@@ -50,10 +46,9 @@
   margin-top: 10px;
 }
 
-<<<<<<< Updated upstream
 .close-btn {
   background: none;
-=======
+  
 .appointment-close-btn {
   position: absolute;
   right: 20px;
@@ -61,7 +56,6 @@
   transform: translateY(-50%);
   width: 30px;
   height: 30px;
->>>>>>> Stashed changes
   border: none;
   background: none;
   cursor: pointer;
@@ -69,13 +63,8 @@
   align-items: center;
   justify-content: center;
   font-size: 22px;
-<<<<<<< Updated upstream
-  color: #fff;
-  cursor: pointer;
-=======
   color: #fff !important;
   transition: color 0.3s ease;
->>>>>>> Stashed changes
 }
 
 .appointment-close-btn:hover {
@@ -90,10 +79,6 @@
   height: 2px;
   background-color: currentColor;
   transform: rotate(45deg);
-}
-
-.appointment-close-btn::after {
-  transform: rotate(-45deg);
 }
 
 /* Form chính */

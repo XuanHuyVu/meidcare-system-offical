@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   getAppointments,
@@ -43,15 +44,12 @@ const AppointmentList = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [appointmentToDelete, setAppointmentToDelete] = useState(null);
 
-<<<<<<< Updated upstream
-=======
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
->>>>>>> Stashed changes
   useEffect(() => {
     fetchAppointments();
     fetchAdditionalData(); // Load additional data like patients, doctors, etc.
@@ -136,11 +134,6 @@ const AppointmentList = () => {
   };
 
   const handleDeleteClick = (appointment) => {
-<<<<<<< Updated upstream
-    // Save the appointment ID to be deleted
-    setAppointmentToDelete(appointment.appointmentId);
-    setShowConfirmModal(true); // Show confirmation modal
-=======
     const today = dayjs().startOf('day');
     const appointmentDate = dayjs(appointment.appointmentDate).startOf('day');
     
@@ -156,7 +149,6 @@ const AppointmentList = () => {
     
     setAppointmentToDelete(appointment.appointmentId);
     setShowConfirmModal(true);
->>>>>>> Stashed changes
   };
 
   const confirmDeleteAppointment = async () => {
@@ -209,12 +201,6 @@ const AppointmentList = () => {
       }, 3000);
     }
   };
-<<<<<<< Updated upstream
-
-  const handleCancelDelete = () => {
-    setShowConfirmModal(false); // Close confirmation modal without deleting
-    setAppointmentToDelete(null); // Reset appointment ID
-=======
 
   const handleCancelDelete = () => {
     setShowConfirmModal(false);
@@ -280,7 +266,6 @@ const AppointmentList = () => {
   const handlePageSizeChange = (e) => {
     setPageSize(Number(e.target.value));
     setCurrentPage(1);
->>>>>>> Stashed changes
   };
 
   return (
@@ -471,13 +456,6 @@ const AppointmentList = () => {
         )}
       </div>
 
-<<<<<<< Updated upstream
-      {/* Confirmation modal for deleting */}
-      <ConfirmModal
-        isOpen={showConfirmModal}
-        title="Xác nhận xóa"
-        message="Bạn có chắc chắn muốn xóa lịch hẹn này?"
-=======
       {/* Pagination */}
       <div className="appointment-list-pagination-row">
         <div className="appointment-list-pagination-info">
@@ -530,7 +508,6 @@ const AppointmentList = () => {
             Bạn có chắc chắn muốn xóa lịch hẹn này không?
           </div>
         }
->>>>>>> Stashed changes
         onConfirm={confirmDeleteAppointment}
         onCancel={handleCancelDelete}
       />

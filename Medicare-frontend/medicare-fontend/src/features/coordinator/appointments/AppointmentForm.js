@@ -8,7 +8,6 @@ import {
   GetServicesAsync,
   GetDoctorsAsync,
   GetClinicsAsync,
-  CheckPatientExistence,
   GetPatientsAsync,
 } from "../../../api/AppointmentDropdown";
 import { CreateAsync, updateAppointment } from "../../../api/AppointmentApi";
@@ -23,31 +22,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
     clinicId: "",
   };
 
-<<<<<<< Updated upstream
-  // Xử lý khi chọn bệnh nhân và cập nhật thông tin bệnh nhân vào form
-  const handlePatientChange = (e) => {
-    const { value } = e.target;
-    const selectedPatient = patients.find(
-      (patient) => String(patient.patientId) === value
-    );
-
-    // Cập nhật patientId và patientName trong form
-    setForm((prev) => ({
-      ...prev,
-      patientId: value, // Lưu ID của bệnh nhân
-      patientName: selectedPatient ? selectedPatient.fullName : "", // Lấy tên bệnh nhân từ danh sách
-    }));
-
-    // Kiểm tra sự tồn tại của bệnh nhân
-    if (selectedPatient) {
-      setPatientExists(true); // Bệnh nhân tồn tại
-    } else {
-      setPatientExists(false); // Bệnh nhân không tồn tại
-    }
-  };
-
-=======
->>>>>>> Stashed changes
   const [form, setForm] = useState(initialForm);
   const [appointmentDate, setAppointmentDate] = useState(null);
   const [appointmentTime, setAppointmentTime] = useState(null);
@@ -62,64 +36,10 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
   const [isLoadingServices, setIsLoadingServices] = useState(false);
   const [isLoadingClinics, setIsLoadingClinics] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-<<<<<<< Updated upstream
-  const [errors, setErrors] = useState({});
-  const [patientExists, setPatientExists] = useState(true);
-
-  // Hàm kiểm tra tính hợp lệ của form
-  const validateForm = () => {
-    let formErrors = {};
-    let isValid = true;
-
-    if (!form.patientId || !form.patientName) {
-      // Kiểm tra cả patientId và patientName
-      formErrors.patientName = "Bệnh nhân là bắt buộc.";
-      isValid = false;
-    }
-
-    if (!patientExists) {
-      formErrors.patientName = "Bệnh nhân không tồn tại.";
-      isValid = false;
-    }
-
-    if (!form.appointmentDate) {
-      formErrors.appointmentDate = "Ngày khám là bắt buộc.";
-      isValid = false;
-    }
-
-    if (!form.appointmentTime) {
-      formErrors.appointmentTime = "Giờ khám là bắt buộc.";
-      isValid = false;
-    }
-
-    if (!form.clinicId) {
-      formErrors.clinicId = "Phòng khám là bắt buộc.";
-      isValid = false;
-    }
-
-    if (!form.serviceId) {
-      formErrors.serviceId = "Dịch vụ khám là bắt buộc.";
-      isValid = false;
-    }
-    if (!form.specialtyId) {
-      formErrors.specialtyId = "Chuyên khoa là bắt buộc.";
-      isValid = false;
-    }
-    if (!form.doctorId) {
-      formErrors.doctorId = "Bác sĩ phụ trách là bắt buộc.";
-      isValid = false;
-    }
-
-    setErrors(formErrors); // Lưu lỗi vào state
-    return isValid;
-  };
-
-=======
   const [successMessageText, setSuccessMessageText] = useState("");
   const [errors, setErrors] = useState({});
   const [patientExists, setPatientExists] = useState(true);
 
->>>>>>> Stashed changes
   // Load dữ liệu khi mở form
   useEffect(() => {
     if (!open) return;
@@ -128,16 +48,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       setIsLoadingForm(true);
       setIsLoadingClinics(true);
       try {
-<<<<<<< Updated upstream
-        const [specialtiesRes, servicesRes, doctorsRes, clinicsRes] =
-          await Promise.all([
-            GetSpecialtiesAsync(),
-            GetServicesAsync(),
-            GetDoctorsAsync(),
-            GetClinicsAsync(),
-            GetPatientsAsync(), // Lấy danh sách bệnh nhân
-          ]);
-=======
         const [
           specialtiesRes,
           servicesRes,
@@ -152,22 +62,13 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
           GetPatientsAsync(),
         ]);
 
->>>>>>> Stashed changes
         setSpecialties(specialtiesRes.data || []);
         setServices(servicesRes.data || []);
         setAllDoctors(doctorsRes.data || []);
         setDoctors(doctorsRes.data || []);
         setClinics(clinicsRes.data || []);
-        setPatients((await GetPatientsAsync()).data || []); // Lấy danh sách bệnh nhân
+        setPatients(patientsRes.data || []);
       } catch (error) {
-<<<<<<< Updated upstream
-        setSpecialties([]);
-        setServices([]);
-        setAllDoctors([]);
-        setDoctors([]);
-        setClinics([]);
-=======
->>>>>>> Stashed changes
         alert("Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại!");
       } finally {
         setIsLoadingForm(false);
@@ -178,11 +79,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
     fetchDropdowns();
   }, [open]);
 
-<<<<<<< Updated upstream
-  // Điền dữ liệu vào form khi sửa lịch
-=======
   // Load dữ liệu khi sửa lịch hẹn
->>>>>>> Stashed changes
   useEffect(() => {
     if (
       appointment &&
@@ -208,16 +105,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       setAppointmentDate(new Date(appointment.appointmentDate));
       setAppointmentTime(new Date(fullDate));
 
-<<<<<<< Updated upstream
-      setForm({
-        patientId: String(appointment.patientId) || "",
-        serviceId: String(appointment.serviceId) || "",
-        specialtyId: String(appointment.specialtyId) || "",
-        doctorId: String(appointment.doctorId) || "",
-        patientName: appointment.patientName || "",
-        clinicId: String(appointment.clinicId) || "",
-      });
-=======
       const selectedService = services.find(
         (s) => String(s.serviceId) === String(appointment.serviceId)
       );
@@ -237,18 +124,13 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       });
 
       console.log("Updated form:", form); // Kiểm tra giá trị form sau khi set
->>>>>>> Stashed changes
     } else if (!appointment) {
       setForm(initialForm);
       setAppointmentDate(null);
       setAppointmentTime(null);
       setDoctors([]);
     }
-<<<<<<< Updated upstream
-  }, [appointment, services, specialties, allDoctors, clinics]);
-=======
   }, [appointment, services, specialties, allDoctors, clinics, patients]);
->>>>>>> Stashed changes
 
   // Lọc bác sĩ theo chuyên khoa
   useEffect(() => {
@@ -295,26 +177,12 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       setForm((prev) => ({
         ...prev,
         specialtyId: value,
-        doctorId: "", // Clear doctor selection when specialty changes
+        doctorId: "",
       }));
     } else if (name === "doctorId" || name === "clinicId") {
       setForm((prev) => ({
         ...prev,
         [name]: value,
-      }));
-    } else if (name === "appointmentDate") {
-      // Cập nhật giá trị ngày
-      setAppointmentDate(value); // Cập nhật giá trị ngày
-      setForm((prev) => ({
-        ...prev,
-        appointmentDate: value, // Cập nhật form với giá trị ngày
-      }));
-    } else if (name === "appointmentTime") {
-      // Cập nhật giá trị giờ
-      setAppointmentTime(value); // Cập nhật giá trị giờ
-      setForm((prev) => ({
-        ...prev,
-        appointmentTime: value, // Cập nhật form với giá trị giờ
       }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
@@ -425,12 +293,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       const selectedDoctor = doctors.find(
         (d) => String(d.doctorId) === String(form.doctorId)
       );
-<<<<<<< Updated upstream
-      const selectedClinic = clinics.find(
-        (c) => String(c.clinicId) === String(form.clinicId)
-      );
-=======
->>>>>>> Stashed changes
       const selectedSpecialty = specialties.find(
         (s) => String(s.specialtyId) === String(form.specialtyId)
       );
@@ -442,23 +304,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       );
 
       const submissionData = {
-<<<<<<< Updated upstream
-        appointmentId: appointment?.appointmentId || 0,
-        patientId: form.patientId, // Sử dụng patientId thay vì patientName
-        serviceId: form.serviceId,
-        doctorId: form.doctorId,
-        clinicId: form.clinicId,
-        specialtyId: form.specialtyId,
-        serviceName: selectedService?.serviceName || "",
-        doctorName: selectedDoctor?.fullName || "",
-        clinicName: selectedClinic?.clinicName || "",
-        specialtyName: selectedSpecialty?.specialtyName || "",
-        appointmentDate: form.appointmentDate
-          ? new Date(form.appointmentDate).toISOString().split("T")[0]
-          : "",
-        appointmentTime: form.appointmentTime
-          ? form.appointmentTime.toISOString().split("T")[1].split(".")[0]
-=======
         patientId: Number(form.patientId),
         dateOfBirth: selectedPatient?.dateOfBirth || "",
         doctorId: Number(selectedDoctor?.doctorId),
@@ -468,7 +313,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
         appointmentDate: appointmentDate ? dayjs(appointmentDate).format('YYYY-MM-DD') : "",
         appointmentTime: appointmentTime
           ? appointmentTime.toISOString().split("T")[1].split(".")[0]
->>>>>>> Stashed changes
           : "",
       };
 
@@ -478,13 +322,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       }
 
       console.log("Dữ liệu gửi đi:", submissionData);
-<<<<<<< Updated upstream
-      onSubmit(submissionData);
-      onClose();
-
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 2000);
-=======
 
       try {
         let response;
@@ -519,7 +356,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
           setSuccessMessageText("");
         }, 3000);
       }
->>>>>>> Stashed changes
     } else {
       console.log("Form validate lỗi:", errors, form);
     }
@@ -527,17 +363,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
 
   // Xử lý hủy form
   const handleCancel = () => {
-<<<<<<< Updated upstream
-    const hasData =
-      Object.values(form).some(
-        (value) => value && value.toString().trim() !== ""
-      ) ||
-      appointmentDate ||
-      appointmentTime;
-    if (hasData) {
-      setShowCancelModal(true);
-    } else {
-=======
     const hasFormData = Object.values(form).some((value) => value != null && value !== "");
     const hasDateTimeData = appointmentDate !== null || appointmentTime !== null;
     const hasData = hasFormData || hasDateTimeData;
@@ -550,33 +375,12 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       setAppointmentTime(null);
       setErrors({});
       setPatientExists(true);
->>>>>>> Stashed changes
       onClose();
     }
   };
 
-  if (!open) return null;
-
   return (
     <>
-<<<<<<< Updated upstream
-      {showCancelModal ? (
-        <ConfirmModal
-          open={showCancelModal}
-          title="XÁC NHẬN THOÁT"
-          message={
-            appointment
-              ? "Bạn có muốn thoát khỏi chức năng đổi lịch khám không?"
-              : "Bạn có muốn thoát khỏi chức năng thêm lịch khám không?"
-          }
-          onConfirm={onClose}
-          onCancel={() => setShowCancelModal(false)}
-        />
-      ) : (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-=======
       <ConfirmModal
         isOpen={showCancelModal}
         title="Xác nhận thoát"
@@ -592,7 +396,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
         <div className="appointment-modal-overlay">
           <div className="appointment-modal-content">
             <div className="appointment-modal-header">
->>>>>>> Stashed changes
               <h2>{appointment ? "SỬA LỊCH KHÁM" : "ĐẶT LỊCH KHÁM"}</h2>
               <button className="appointment-close-btn" onClick={handleCancel}></button>
             </div>
@@ -644,10 +447,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
-<<<<<<< Updated upstream
-=======
                     {errors.serviceId && <p className="appointment-error-message">{errors.serviceId}</p>}
->>>>>>> Stashed changes
                   </div>
 
                   {/* Chuyên khoa */}
@@ -668,10 +468,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
-<<<<<<< Updated upstream
-=======
                     {errors.specialtyId && <p className="appointment-error-message">{errors.specialtyId}</p>}
->>>>>>> Stashed changes
                   </div>
 
                   {/* Bác sĩ */}
@@ -692,10 +489,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
-<<<<<<< Updated upstream
-=======
                     {errors.doctorId && <p className="appointment-error-message">{errors.doctorId}</p>}
->>>>>>> Stashed changes
                   </div>
 
                   {/* Tên bệnh nhân */}
@@ -706,7 +500,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                     <select
                       name="patientId"
                       value={form.patientId}
-                      onChange={handlePatientChange} // Sử dụng hàm kiểm tra khi thay đổi patientId
+                      onChange={handlePatientChange}
                       required
                     >
                       <option value="">Chọn bệnh nhân</option>
@@ -716,13 +510,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
-<<<<<<< Updated upstream
-                    {errors.patientId && (
-                      <p className="error">{errors.patientId}</p>
-                    )}
-=======
                     {errors.patientName && <p className="appointment-error-message">{errors.patientName}</p>}
->>>>>>> Stashed changes
                   </div>
 
                   {/* Ngày khám */}
@@ -733,13 +521,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                     <DatePicker
                       selected={appointmentDate}
                       onChange={(date) => {
-<<<<<<< Updated upstream
-                        setAppointmentDate(date);
-                        setForm((prev) => ({
-                          ...prev,
-                          appointmentDate: date, // Cập nhật giá trị cho form
-                        }));
-=======
                         const selectedDate = dayjs(date).startOf('day');
                         const tomorrow = dayjs().add(1, 'day').startOf('day');
                         
@@ -754,7 +535,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         } else {
                           setAppointmentDate(date);
                         }
->>>>>>> Stashed changes
                       }}
                       dateFormat="yyyy-MM-dd"
                       placeholderText="Chọn ngày"
@@ -763,10 +543,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       minDate={new Date(dayjs().add(1, 'day').format('YYYY-MM-DD'))}
                       maxDate={new Date(dayjs().add(30, 'day').format('YYYY-MM-DD'))}
                     />
-<<<<<<< Updated upstream
-=======
                     {errors.appointmentDate && <p className="appointment-error-message">{errors.appointmentDate}</p>}
->>>>>>> Stashed changes
                   </div>
 
                   {/* Giờ khám */}
@@ -776,17 +553,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                     </label>
                     <DatePicker
                       selected={appointmentTime}
-<<<<<<< Updated upstream
-                      onChange={(time) => {
-                        setAppointmentTime(time);
-                        setForm((prev) => ({
-                          ...prev,
-                          appointmentTime: time, // Cập nhật giá trị giờ cho form
-                        }));
-                      }}
-=======
                       onChange={(time) => setAppointmentTime(time)}
->>>>>>> Stashed changes
                       showTimeSelect
                       showTimeSelectOnly
                       timeIntervals={15}
@@ -796,10 +563,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       className="form-control"
                       required
                     />
-<<<<<<< Updated upstream
-=======
                     {errors.appointmentTime && <p className="appointment-error-message">{errors.appointmentTime}</p>}
->>>>>>> Stashed changes
                   </div>
 
                   {/* Phòng khám */}
@@ -821,10 +585,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         </option>
                       ))}
                     </select>
-<<<<<<< Updated upstream
-=======
                     {errors.clinicId && <p className="appointment-error-message">{errors.clinicId}</p>}
->>>>>>> Stashed changes
                   </div>
                 </div>
 
@@ -836,14 +597,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                     Hủy bỏ
                   </button>
                 </div>
-<<<<<<< Updated upstream
-                {showSuccessMessage && (
-                  <div className="success-message">
-                    <p>Lịch hẹn đã được lưu thành công!</p>
-                  </div>
-                )}
-=======
->>>>>>> Stashed changes
               </form>
             )}
           </div>

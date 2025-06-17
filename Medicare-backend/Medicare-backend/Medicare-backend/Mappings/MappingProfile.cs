@@ -40,13 +40,19 @@ namespace Medicare_backend.Mappings
             CreateMap<User, UserDto>().ReverseMap();
 
             CreateMap<Appointment, AppointmentDto>()
-                .ForMember(dest => dest.PatientName, opt => opt.MapFrom(src => src.Patient.FullName))
+                .ForMember(dest => dest.PatientId, opt => opt.MapFrom(src => src.PatientId))
                 .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.Patient.DateOfBirth))
-                .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(src => src.Doctor.FullName))
-                .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.Service.ServiceName))
-                .ForMember(dest => dest.SpecialtyName, opt => opt.MapFrom(src => src.Service.Specialty.SpecialtyName))
-                .ForMember(dest => dest.ClinicName, opt => opt.MapFrom(src => src.Clinic.ClinicName))
-                .ReverseMap();
+                .ForMember(dest => dest.DoctorId, opt => opt.MapFrom(src => src.DoctorId))
+                .ForMember(dest => dest.ServiceId, opt => opt.MapFrom(src => src.ServiceId))
+                .ForMember(dest => dest.SpecialtyId, opt => opt.MapFrom(src => src.Service.SpecialtyId))
+                .ForMember(dest => dest.ClinicId, opt => opt.MapFrom(src => src.ClinicId))
+                .ForMember(dest => dest.AppointmentDate, opt => opt.MapFrom(src => src.AppointmentDate))
+                .ForMember(dest => dest.AppointmentTime, opt => opt.MapFrom(src => src.AppointmentTime))
+                .ReverseMap()
+                .ForMember(dest => dest.Patient, opt => opt.Ignore())
+                .ForMember(dest => dest.Doctor, opt => opt.Ignore())
+                .ForMember(dest => dest.Service, opt => opt.Ignore())
+                .ForMember(dest => dest.Clinic, opt => opt.Ignore());
         }
     }
 }
