@@ -10,8 +10,9 @@ import {
   GetClinicsAsync,
   GetPatientsAsync,
 } from "../../../api/AppointmentDropdown";
-import { CreateAsync, updateAppointment } from "../../../api/AppointmentApi";
+import { appointmentProxyApi } from "../../../api/AppointmentProxyApi";
 import dayjs from "dayjs";
+import { toast } from "react-toastify";
 
 const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
   const initialForm = {
@@ -35,10 +36,9 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isLoadingServices, setIsLoadingServices] = useState(false);
   const [isLoadingClinics, setIsLoadingClinics] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [successMessageText, setSuccessMessageText] = useState("");
   const [errors, setErrors] = useState({});
   const [patientExists, setPatientExists] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load dữ liệu khi mở form
   useEffect(() => {
@@ -267,103 +267,53 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
   // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
-    if (validateForm()) {
-      // Kiểm tra các trường quan trọng
-      if (
-        form.patientId === "0" ||
-        form.doctorId === "0" ||
-        form.serviceId === "0" ||
-        form.specialtyId === "0" ||
-        form.clinicId === "0"
-      ) {
-        setShowSuccessMessage(true);
-        setSuccessMessageText("Vui lòng chọn bệnh nhân, bác sĩ, dịch vụ, chuyên khoa và phòng khám hợp lệ.");
-        setTimeout(() => {
-          setShowSuccessMessage(false);
-          setSuccessMessageText("");
-        }, 3000);
-        return;
-      }
-
-      // Lấy các đối tượng từ danh sách đã chọn
-      const selectedService = services.find(
-        (s) => String(s.serviceId) === String(form.serviceId)
-      );
-      const selectedDoctor = doctors.find(
-        (d) => String(d.doctorId) === String(form.doctorId)
-      );
-      const selectedSpecialty = specialties.find(
-        (s) => String(s.specialtyId) === String(form.specialtyId)
-      );
-      const selectedClinic = clinics.find(
-        (c) => String(c.clinicId) === String(form.clinicId)
-      );
-      const selectedPatient = patients.find(
-        (p) => String(p.patientId) === String(form.patientId)
-      );
-
-      const formatTime = (dateObj) => {
-        if (!dateObj) return "";
-        const hours = dateObj.getHours().toString().padStart(2, "0");
-        const minutes = dateObj.getMinutes().toString().padStart(2, "0");
-        return `${hours}:${minutes}:00`;
-      };
-
-
+    setIsSubmitting(true);
+    try {
       const submissionData = {
-        patientId: Number(form.patientId),
-        dateOfBirth: selectedPatient?.dateOfBirth || "",
-        doctorId: Number(selectedDoctor?.doctorId),
-        serviceId: Number(selectedService?.serviceId),
-        specialtyId: Number(selectedSpecialty?.specialtyId),
-        clinicId: Number(selectedClinic?.clinicId),
-        appointmentDate: appointmentDate ? dayjs(appointmentDate).format('YYYY-MM-DD') : "",
-        appointmentTime: formatTime(appointmentTime)
+        ...form,
+        appointmentDate: dayjs(appointmentDate).format("YYYY-MM-DD"),
+        appointmentTime: dayjs(appointmentTime).format("HH:mm:ss"),
       };
 
-      // Nếu đang sửa lịch khám, thêm appointmentId vào dữ liệu
+      // Thêm appointmentId khi cập nhật
       if (appointment) {
         submissionData.appointmentId = appointment.appointmentId;
+        console.log("Updating appointment:", submissionData);
+      } else {
+        console.log("Creating appointment:", submissionData);
       }
 
-      console.log("Dữ liệu gửi đi:", submissionData);
+      let response;
+      if (appointment) {
+        response = await appointmentProxyApi.updateAppointment(appointment.appointmentId, submissionData);
+      } else {
+        response = await appointmentProxyApi.createAppointment(submissionData);
+      }
 
-      try {
-        let response;
-        if (appointment) {
-          // Gọi API cập nhật nếu đang sửa
-          response = await updateAppointment(appointment.appointmentId, submissionData);
-          console.log("Lịch khám đã được cập nhật:", response);
-        } else {
-          // Gọi API tạo mới nếu đang thêm
-          response = await CreateAsync(submissionData);
-          console.log("Lịch khám đã được tạo:", response);
-        }
-        
-        // Reset form
-        setForm(initialForm);
-        setAppointmentDate(null);
+      console.log("Response:", response);
+
+      // Đóng form ngay lập tức sau khi thành công
+      onClose();
+      onSubmit();
+    } catch (error) {
+      console.error("Error submitting appointment:", error);
+      // Xử lý lỗi trùng lịch từ backend
+      if (error.message && error.message.includes("trùng với lịch hẹn khác của bác sĩ")) {
+        setErrors(prev => ({
+          ...prev,
+          appointmentTime: error.message
+        }));
+        // Reset thời gian đã chọn
         setAppointmentTime(null);
-        setErrors({});
-        setPatientExists(true);
-        
-        // Đóng form và gọi callback để hiển thị thông báo thành công
-        onClose();
-        if (onSubmit) {
-          onSubmit();
-        }
-      } catch (error) {
-        console.error("Lỗi khi xử lý lịch khám:", error.response);
-        setShowSuccessMessage(true);
-        setSuccessMessageText("Có lỗi xảy ra khi xử lý lịch khám. Vui lòng thử lại.");
-        setTimeout(() => {
-          setShowSuccessMessage(false);
-          setSuccessMessageText("");
-        }, 3000);
+      } else if (error.response?.data) {
+        toast.error(error.response.data);
+      } else {
+        toast.error("Có lỗi xảy ra khi lưu lịch hẹn. Vui lòng thử lại!");
       }
-    } else {
-      console.log("Form validate lỗi:", errors, form);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -403,26 +353,8 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
           <div className="appointment-modal-content">
             <div className="appointment-modal-header">
               <h2>{appointment ? "SỬA LỊCH KHÁM" : "ĐẶT LỊCH KHÁM"}</h2>
-              <button className="appointment-close-btn" onClick={handleCancel}></button>
+              <button className="appointment-close-btn" onClick={handleCancel}>×</button>
             </div>
-
-            {showSuccessMessage && (
-              <div className="appointment-success-message">
-                <div className="appointment-error-icon-bg">
-                  <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-                    <circle cx="19" cy="19" r="19" fill="#FF4D4F" />
-                    <path
-                      d="M24 14L14 24M14 14L24 24"
-                      stroke="white"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <span>{successMessageText}</span>
-              </div>
-            )}
 
             {isLoadingForm ? (
               <div className="appointment-loading-message">Đang tải dữ liệu, vui lòng chờ...</div>
@@ -531,12 +463,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                         const tomorrow = dayjs().add(1, 'day').startOf('day');
                         
                         if (selectedDate.isBefore(tomorrow)) {
-                          setShowSuccessMessage(true);
-                          setSuccessMessageText("Không thể đặt lịch khám trong ngày hiện tại.");
-                          setTimeout(() => {
-                            setShowSuccessMessage(false);
-                            setSuccessMessageText("");
-                          }, 3000);
                           setAppointmentDate(null);
                         } else {
                           setAppointmentDate(date);
@@ -559,17 +485,28 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                     </label>
                     <DatePicker
                       selected={appointmentTime}
-                      onChange={(time) => setAppointmentTime(time)}
+                      onChange={(time) => {
+                        setAppointmentTime(time);
+                        // Xóa lỗi khi người dùng thay đổi thời gian
+                        setErrors(prev => ({
+                          ...prev,
+                          appointmentTime: undefined
+                        }));
+                      }}
                       showTimeSelect
                       showTimeSelectOnly
                       timeIntervals={15}
                       timeCaption="Giờ"
                       dateFormat="HH:mm"
                       placeholderText="Chọn giờ"
-                      className="form-control"
+                      className={`form-control ${errors.appointmentTime ? 'is-invalid' : ''}`}
                       required
                     />
-                    {errors.appointmentTime && <p className="appointment-error-message">{errors.appointmentTime}</p>}
+                    {errors.appointmentTime && (
+                      <p className="appointment-error-message" style={{ color: 'red', marginTop: '5px' }}>
+                        {errors.appointmentTime}
+                      </p>
+                    )}
                   </div>
 
                   {/* Phòng khám */}
@@ -596,10 +533,19 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                 </div>
 
                 <div className="appointment-form-actions">
-                  <button type="submit" className="appointment-submit-btn">
-                    Xác nhận
+                  <button 
+                    type="submit" 
+                    className="appointment-submit-btn"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Đang xử lý..." : "Xác nhận"}
                   </button>
-                  <button type="button" className="appointment-cancel-btn" onClick={handleCancel}>
+                  <button 
+                    type="button" 
+                    className="appointment-cancel-btn" 
+                    onClick={handleCancel}
+                    disabled={isSubmitting}
+                  >
                     Hủy bỏ
                   </button>
                 </div>

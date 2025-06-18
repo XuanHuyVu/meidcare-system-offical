@@ -8,4 +8,6 @@
 *.exe
 *.pdb
 *.json
+/Medicare-backend/Medicare-backend/Medicare-backend/appsettings.json
+
 

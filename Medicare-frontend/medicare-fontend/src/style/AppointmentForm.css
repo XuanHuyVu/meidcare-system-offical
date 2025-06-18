@@ -46,9 +46,6 @@
   margin-top: 10px;
 }
 
-.close-btn {
-  background: none;
-}
 .appointment-close-btn {
   position: absolute;
   right: 20px;
@@ -62,24 +59,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 28px;
   color: #fff !important;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  z-index: 1001;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  font-weight: bold;
 }
 
 .appointment-close-btn:hover {
   color: #ffdddd !important;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-50%) scale(1.1);
 }
 
-.appointment-close-btn::before,
-.appointment-close-btn::after {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 2px;
-  background-color: currentColor;
-  transform: rotate(45deg);
-}
 
 /* Form chính */
 .appointment-form {
