@@ -47,18 +47,17 @@ class AppointmentProxyApi {
 
     async updateAppointment(id, data) {
         try {
-            console.log("Proxy API - Updating appointment:", { id, data });
             await this.validateAppointmentTime(data);
             const response = await axiosInstance.put(`${this.baseUrl}/${id}`, data);
-            console.log("Proxy API - Update response:", response);
             return response.data;
         } catch (error) {
             console.error("Error updating appointment:", error);
             if (error.response?.data) {
+                // Lấy message từ backend
                 const errorMessage = typeof error.response.data === 'string'
                     ? error.response.data
                     : JSON.stringify(error.response.data);
-                toast.error(errorMessage);
+                toast.error(errorMessage); // <-- Hiển thị toast
                 throw new Error(errorMessage);
             } else {
                 toast.error("Có lỗi xảy ra khi cập nhật lịch. Vui lòng thử lại!");

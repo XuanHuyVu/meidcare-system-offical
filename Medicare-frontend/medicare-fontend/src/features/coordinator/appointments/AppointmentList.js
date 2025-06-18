@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import {
   getAppointments,
@@ -16,9 +14,12 @@ import Header from "../../../components/Header";
 import AppointmentForm from "./AppointmentForm";
 import AppointmentDetail from "./AppointmentDetail";
 import ConfirmModal from "../../../components/ConfirmModal";
-import "../../../style/AppointmentList.css";
+import "../../../style/AppointmentList.css";  
 import dayjs from "dayjs";
 import { FaInfoCircle, FaEdit, FaTrash } from "react-icons/fa";
+import { useAppointmentTemplate } from "./useAppointmentTemplate";
+import { appointmentProxyApi } from "../../../api/AppointmentProxyApi";
+import { toast } from "react-toastify";
 
 const AppointmentList = () => {
   const [appointments, setAppointments] = useState([]);
@@ -50,6 +51,8 @@ const AppointmentList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
+  const { process } = useAppointmentTemplate();
 
   useEffect(() => {
     fetchAppointments();
@@ -157,28 +160,21 @@ const AppointmentList = () => {
       try {
         console.log("Deleting appointment with ID:", appointmentToDelete);
 
-        // Call API to delete the appointment
-        const response = await deleteAppointment(appointmentToDelete);
-
-        if (response.status === 204 || response.status === 200) {
-          console.log("Appointment deleted successfully!");
-          setSuccessMessageText("Xóa lịch khám thành công!");
-          setShowSuccessMessage(true);
-          // Tự động ẩn thông báo sau 3 giây
-          setTimeout(() => {
-            setShowSuccessMessage(false);
-            setSuccessMessageText("");
-          }, 3000);
-          await fetchAppointments();
-        } else {
-          console.error("Failed to delete appointment:", response);
-          setSuccessMessageText("Xóa lịch khám không thành công!");
-          setShowSuccessMessage(true);
-          setTimeout(() => {
-            setShowSuccessMessage(false);
-            setSuccessMessageText("");
-          }, 3000);
-        }
+        await process(appointmentToDelete, {
+          apiCallOverride: async (id) => {
+            return await appointmentProxyApi.deleteAppointment(id);
+          },
+          handleResultOverride: () => {
+            console.log("Appointment deleted successfully!");
+            setSuccessMessageText("Xóa lịch khám thành công!");
+            setShowSuccessMessage(true);
+            setTimeout(() => {
+              setShowSuccessMessage(false);
+              setSuccessMessageText("");
+            }, 3000);
+            fetchAppointments();
+          },
+        });
       } catch (err) {
         console.error("Error deleting appointment:", err);
         setSuccessMessageText(
