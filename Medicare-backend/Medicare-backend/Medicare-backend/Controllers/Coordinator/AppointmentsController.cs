@@ -1,5 +1,6 @@
 ﻿using Medicare_backend.DTOs;
 using Medicare_backend.Services.Interfaces;
+using Medicare_backend.Services.Pattern.Template;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,7 +15,7 @@ namespace Medicare_backend.Controllers.Coordinator
     public class AppointmentsController : ControllerBase
     {
         private readonly IAppointmentProxyService _appointmentService;
- 
+
         public AppointmentsController(IAppointmentProxyService appointmentService)
         {
             _appointmentService = appointmentService;
@@ -59,9 +60,10 @@ namespace Medicare_backend.Controllers.Coordinator
         [HttpPost]
         public async Task<ActionResult<AppointmentDto>> Create(AppointmentDto dto)
         {
+            var template = new AppointmentCreateTemplate(_appointmentService);
             try
             {
-                var created = await _appointmentService.CreateAsync(dto);
+                var created = await template.ProcessAsync(dto);
                 return CreatedAtAction(nameof(GetById), new { id = created.AppointmentId }, created);
             }
             catch (InvalidOperationException ex)
@@ -74,11 +76,10 @@ namespace Medicare_backend.Controllers.Coordinator
         public async Task<IActionResult> Update(int id, AppointmentDto dto)
         {
             dto.AppointmentId = id;
-            
+            var template = new AppointmentUpdateTemplate(_appointmentService, id);
             try
             {
-                var updated = await _appointmentService.UpdateAsync(id, dto);
-                if (!updated) return NotFound();
+                await template.ProcessAsync(dto);
                 return NoContent();
             }
             catch (InvalidOperationException ex)
@@ -90,9 +91,16 @@ namespace Medicare_backend.Controllers.Coordinator
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _appointmentService.DeleteAsync(id);
-            if (!deleted) return NotFound();
-            return NoContent();
+            var template = new AppointmentDeleteTemplate(_appointmentService);
+            try
+            {
+                await template.ProcessAsync(id);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
