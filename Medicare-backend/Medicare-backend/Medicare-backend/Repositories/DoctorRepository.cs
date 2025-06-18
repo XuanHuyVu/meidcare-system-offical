@@ -1,4 +1,4 @@
-﻿using Medicare_backend.Data;
+using Medicare_backend.Data;
 using Medicare_backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
