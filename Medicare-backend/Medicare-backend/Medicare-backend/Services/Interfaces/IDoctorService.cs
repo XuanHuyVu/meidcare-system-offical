@@ -1,8 +1,9 @@
-﻿using Medicare_backend.DTOs;
+using Medicare_backend.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Medicare_backend.Services;
 
-namespace Medicare_backend.Services.Interfaces
+namespace Medicare_backend.Services
 {
     public interface IDoctorService
     {
