@@ -13,6 +13,7 @@ import {
 import { appointmentProxyApi } from "../../../api/AppointmentProxyApi";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
+import { useAppointmentTemplate } from "./useAppointmentTemplate";
 
 const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
   const initialForm = {
@@ -39,6 +40,8 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
   const [errors, setErrors] = useState({});
   const [patientExists, setPatientExists] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { process } = useAppointmentTemplate();
 
   // Load dữ liệu khi mở form
   useEffect(() => {
@@ -277,26 +280,22 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
         appointmentTime: dayjs(appointmentTime).format("HH:mm:ss"),
       };
 
-      // Thêm appointmentId khi cập nhật
-      if (appointment) {
-        submissionData.appointmentId = appointment.appointmentId;
-        console.log("Updating appointment:", submissionData);
-      } else {
-        console.log("Creating appointment:", submissionData);
-      }
-
-      let response;
-      if (appointment) {
-        response = await appointmentProxyApi.updateAppointment(appointment.appointmentId, submissionData);
-      } else {
-        response = await appointmentProxyApi.createAppointment(submissionData);
-      }
-
-      console.log("Response:", response);
-
-      // Đóng form ngay lập tức sau khi thành công
-      onClose();
-      onSubmit();
+      await process(submissionData, {
+        apiCallOverride: async (data) => {
+          if (appointment) {
+            return await appointmentProxyApi.updateAppointment(
+              appointment.appointmentId,
+              data
+            );
+          } else {
+            return await appointmentProxyApi.createAppointment(data);
+          }
+        },
+        handleResultOverride: () => {
+          onClose();
+          onSubmit();
+        },
+      });
     } catch (error) {
       console.error("Error submitting appointment:", error);
       // Xử lý lỗi trùng lịch từ backend
@@ -305,7 +304,6 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
           ...prev,
           appointmentTime: error.message
         }));
-        // Reset thời gian đã chọn
         setAppointmentTime(null);
       } else if (error.response?.data) {
         toast.error(error.response.data);
