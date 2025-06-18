@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Medicare_backend.Models;
 
 namespace Medicare_backend.Controllers.Coordinator
 {
@@ -13,8 +12,8 @@ namespace Medicare_backend.Controllers.Coordinator
     [Authorize(Policy = "RequireCoordinatorRole")]
     public class ServicesController : ControllerBase
     {
-        private readonly IService _service;
-        public ServicesController(IService service)
+        private readonly IServiceService _service;
+        public ServicesController(IServiceService service)
         {
             _service = service;
         }
@@ -32,18 +31,18 @@ namespace Medicare_backend.Controllers.Coordinator
             return Ok(result);
         }
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Service service)
+        public async Task<IActionResult> Create([FromBody] ServiceDto serviceDto)
         {
-            var result = await _service.CreateAsync(service);
+            var result = await _service.CreateAsync(serviceDto);
             return CreatedAtAction(nameof(GetById), new { id = result.ServiceId }, result);
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Service service)
+        public async Task<IActionResult> Update(int id, [FromBody] ServiceDto serviceDto)
         {
-            if (id != service.ServiceId) return BadRequest();
-            var result = await _service.UpdateAsync(id, service);
-            if (result == null) return NotFound();
-            return Ok(result);
+            if (id != serviceDto.ServiceId) return BadRequest();
+            var result = await _service.UpdateAsync(id, serviceDto);
+            if (!result) return NotFound();
+            return Ok();
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

@@ -1,4 +1,4 @@
-using Medicare_backend.Models;
+using Medicare_backend.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,6 +6,6 @@ namespace Medicare_backend.Services.Interfaces
 {
     public interface IServiceSearchStrategy
     {
-        Task<IEnumerable<Service>> SearchAsync(IQueryable<Service> query);
+        Task<IEnumerable<ServiceDto>> SearchAsync(IEnumerable<ServiceDto> services);
     }
 } 

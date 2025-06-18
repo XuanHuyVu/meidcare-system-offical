@@ -1,8 +1,6 @@
 ﻿using Medicare_backend.Models;
-using Medicare_backend.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace Medicare_backend.Repositories
 {
@@ -14,7 +12,5 @@ namespace Medicare_backend.Repositories
         Task UpdateAsync(Service service);
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
-        void SetSearchStrategy(IServiceSearchStrategy strategy);
-        Task<IEnumerable<Service>> SearchAsync();
     }
-} 
+}

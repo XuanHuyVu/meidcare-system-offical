@@ -1,4 +1,4 @@
-using Medicare_backend.Models;
+using Medicare_backend.DTOs;
 using Medicare_backend.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +12,13 @@ namespace Medicare_backend.Services.Pattern.Services.Strategies
 
         public ServiceNameSearchStrategy(string searchTerm)
         {
-            _searchTerm = searchTerm?.ToLower() ?? string.Empty;
+            _searchTerm = searchTerm;
         }
 
-        public async Task<IEnumerable<Service>> SearchAsync(IQueryable<Service> query)
+        public Task<IEnumerable<ServiceDto>> SearchAsync(IEnumerable<ServiceDto> services)
         {
-            return await Task.FromResult(query
-                .Where(s => s.ServiceName.ToLower().Contains(_searchTerm))
-                .ToList());
+            var result = services.Where(s => s.ServiceName != null && s.ServiceName.Contains(_searchTerm, System.StringComparison.OrdinalIgnoreCase));
+            return Task.FromResult(result);
         }
     }
 } 

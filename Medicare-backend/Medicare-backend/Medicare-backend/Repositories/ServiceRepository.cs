@@ -11,7 +11,7 @@ namespace Medicare_backend.Repositories
     public class ServiceRepository : IServiceRepository
     {
         private readonly ApplicationDbContext _context;
-        private IServiceSearchStrategy _searchStrategy;
+        private IServiceSearchStrategy? _searchStrategy;
 
         public ServiceRepository(ApplicationDbContext context)
         {
@@ -30,11 +30,12 @@ namespace Medicare_backend.Repositories
                 return await GetAllAsync();
             }
 
-            var query = _context.Services
+            var services = await _context.Services
                 .Include(s => s.Doctor)
-                .Include(s => s.Specialty);
+                .Include(s => s.Specialty)
+                .ToListAsync();
             
-            return await _searchStrategy.SearchAsync(query);
+            return services;
         }
 
         public async Task<IEnumerable<Service>> GetAllAsync()
