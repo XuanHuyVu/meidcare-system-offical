@@ -1,4 +1,4 @@
-﻿namespace Medicare_backend.DTOs
+namespace Medicare_backend.DTOs
 {
     public class DoctorDto
     {
@@ -8,10 +8,11 @@
         public string? Gender { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Email { get; set; }
-        public int SpecialtyId { get; set; }
+        public string? SpecialtyName { get; set; }
         public string? Qualification { get; set; }
         public int YearsOfExperience { get; set; }
         public string? Avatar { get; set; }
         public string? Bio { get; set; }
+        public int SpecialtyId { get; set; }
     }
 }
