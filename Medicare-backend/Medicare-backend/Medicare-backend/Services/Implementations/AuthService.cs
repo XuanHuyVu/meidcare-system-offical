@@ -55,6 +55,9 @@ namespace Medicare_backend.Services.Implementations
                 return null; // Không tìm thấy user
 
             // Kiểm tra password
+            if (user.PasswordHash == null || user.PasswordSalt == null)
+                return null; // Password hash hoặc salt bị null
+
             if (!VerifyPasswordHash(dto.Password, user.PasswordHash, user.PasswordSalt))
                 return null; // Mật khẩu không đúng
 

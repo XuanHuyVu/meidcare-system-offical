@@ -1,4 +1,4 @@
-﻿using Medicare_backend.Models;
+﻿using Medicare_backend.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,11 +6,11 @@ namespace Medicare_backend.Services.Interfaces
 {
     public interface IServiceService
     {
-        Task<IEnumerable<Service>> GetAllServicesAsync();
-        Task<Service> GetServiceByIdAsync(int id);
-        Task<Service> CreateServiceAsync(Service service);
-        Task<Service> UpdateServiceAsync(Service service);
-        Task DeleteServiceAsync(int id);
-        Task<IEnumerable<Service>> SearchServicesAsync(string searchTerm, int? specialtyId);
+        Task<IEnumerable<ServiceDto>> GetAllAsync();
+        Task<ServiceDto?> GetByIdAsync(int id);
+        Task<ServiceDto> CreateAsync(ServiceDto dto);
+        Task<bool> UpdateAsync(int id, ServiceDto dto);
+        Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<ServiceDto>> SearchAsync(string searchTerm, int? specialtyId);
     }
 }

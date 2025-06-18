@@ -19,7 +19,8 @@ namespace Medicare_backend.Repositories
             return await _context.Appointments
                 .Include(a => a.Patient)
                 .Include(a => a.Doctor)
-                .Include(a => a.Service).ThenInclude(s => s.Specialty)
+                .Include(a => a.Service!)
+                .ThenInclude(s => s!.Specialty)
                 .Include(a => a.Clinic)
                 .ToListAsync();
         }
@@ -28,7 +29,8 @@ namespace Medicare_backend.Repositories
             return await _context.Appointments
                 .Include(a => a.Patient)
                 .Include(a => a.Doctor)
-                .Include(a => a.Service).ThenInclude(s => s.Specialty)
+                .Include(a => a.Service!)
+                .ThenInclude(s => s!.Specialty)
                 .Include(a => a.Clinic)
                 .FirstOrDefaultAsync(a => a.AppointmentId == id);
         }
@@ -37,7 +39,8 @@ namespace Medicare_backend.Repositories
             return await _context.Appointments
                 .Where(a => a.PatientId == patientId)
                 .Include(a => a.Doctor)
-                .Include(a => a.Service).ThenInclude(s => s.Specialty)
+                .Include(a => a.Service!)
+                .ThenInclude(s => s!.Specialty)
                 .Include(a => a.Clinic)
                 .ToListAsync();
         }
@@ -46,7 +49,8 @@ namespace Medicare_backend.Repositories
             return await _context.Appointments
                 .Where(a => a.DoctorId == doctorId)
                 .Include(a => a.Patient)
-                .Include(a => a.Service).ThenInclude(s => s.Specialty)
+                .Include(a => a.Service!)
+                .ThenInclude(s => s!.Specialty)
                 .Include(a => a.Clinic)
                 .ToListAsync();
         }
@@ -56,7 +60,8 @@ namespace Medicare_backend.Repositories
                 .Where(a => a.ClinicId == clinicId)
                 .Include(a => a.Patient)
                 .Include(a => a.Doctor)
-                .Include(a => a.Service).ThenInclude(s => s.Specialty)
+                .Include(a => a.Service!)
+                .ThenInclude(s => s!.Specialty)
                 .ToListAsync();
         }
         

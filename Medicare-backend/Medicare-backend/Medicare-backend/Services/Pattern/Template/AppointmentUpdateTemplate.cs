@@ -15,9 +15,10 @@ namespace Medicare_backend.Services.Pattern.Template
             _id = id;
         }
 
-        protected override async Task ValidateAsync(AppointmentDto dto)
+        protected override Task ValidateAsync(AppointmentDto dto)
         {
             // Có thể thêm các bước kiểm tra khác ở đây nếu muốn
+            return Task.CompletedTask;
         }
 
         protected override async Task<AppointmentDto> SaveAsync(AppointmentDto dto)

@@ -1,33 +1,43 @@
-using Medicare_backend.Models;
 using Medicare_backend.Repositories;
 using System.Threading.Tasks;
-using Medicare_backend.Application.Services.Commands; // Assuming UpdateServiceCommand is in this namespace
+using Medicare_backend.Application.Services.Commands;
+using Medicare_backend.DTOs;
+using AutoMapper;
+
 namespace Medicare_backend.Application.Services.Handlers
 {
     public class UpdateServiceCommandHandler
     {
         private readonly IServiceRepository _repo;
-        public UpdateServiceCommandHandler(IServiceRepository repo)
+        private readonly IMapper _mapper;
+        public UpdateServiceCommandHandler(IServiceRepository repo, IMapper mapper)
         {
             _repo = repo;
+            _mapper = mapper;
         }
 
-        public async Task<bool> Handle(UpdateServiceCommand command)
+        public async Task<ServiceDto?> Handle(UpdateServiceCommand command)
         {
             var service = await _repo.GetByIdAsync(command.ServiceId);
-            if (service == null) return false;
+            if (service == null) return null;
 
-            service.ServiceName = command.ServiceName;
-            service.Cost = command.Cost;
-            service.Duration = command.Duration;
-            service.Description = command.Description;
-            service.Image = command.Image;
-            service.DoctorId = command.DoctorId;
-            service.SpecialtyId = command.SpecialtyId;
-            //service.IsActive = command.IsActive;
+            // Chuyển command sang DTO
+            var dto = new ServiceDto
+            {
+                ServiceId = command.ServiceId,
+                ServiceName = command.ServiceName,
+                Cost = command.Cost,
+                Duration = command.Duration,
+                Description = command.Description,
+                Image = command.Image,
+                DoctorId = command.DoctorId,
+                SpecialtyId = command.SpecialtyId,
+            };
 
-            await _repo.UpdateAsync(service);
-            return true;
+            // Map DTO sang entity để lưu
+            var entity = _mapper.Map<Models.Service>(dto);
+            await _repo.UpdateAsync(entity);
+            return _mapper.Map<ServiceDto>(entity);
         }
     }
 } 

@@ -13,7 +13,7 @@ namespace Medicare_backend.Models
         [Required]
         [MaxLength(100)]
         [Column("service_name")]
-        public string ServiceName { get; set; }
+        public required string ServiceName { get; set; }
 
         [MaxLength(500)]
         [Column("description")]
@@ -27,10 +27,8 @@ namespace Medicare_backend.Models
         [Column("duration")]
         public int Duration { get; set; }
 
-        [Required]
         [Column("image")]
-        public string Image { get; set; }
-
+        public string? Image { get; set; }
 
         [Required]
         [Column("doctor_id")]
@@ -46,5 +44,20 @@ namespace Medicare_backend.Models
         [ForeignKey("SpecialtyId")]
         public virtual Specialty? Specialty { get; set; }
 
+        // Constructor để khởi tạo object với required properties
+        public Service()
+        {
+        }
+
+        public Service(string serviceName, decimal cost, int duration, int doctorId, int specialtyId, string? description = null, string? image = null)
+        {
+            ServiceName = serviceName;
+            Cost = cost;
+            Duration = duration;
+            DoctorId = doctorId;
+            SpecialtyId = specialtyId;
+            Description = description;
+            Image = image;
+        }
     }
 } 

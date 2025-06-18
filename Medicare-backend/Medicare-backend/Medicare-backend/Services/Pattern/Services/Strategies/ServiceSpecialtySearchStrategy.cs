@@ -1,4 +1,4 @@
-using Medicare_backend.Models;
+using Medicare_backend.DTOs;
 using Medicare_backend.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +15,10 @@ namespace Medicare_backend.Services.Pattern.Services.Strategies
             _specialtyId = specialtyId;
         }
 
-        public async Task<IEnumerable<Service>> SearchAsync(IQueryable<Service> query)
+        public Task<IEnumerable<ServiceDto>> SearchAsync(IEnumerable<ServiceDto> services)
         {
-            return await Task.FromResult(query
-                .Where(s => s.SpecialtyId == _specialtyId)
-                .ToList());
+            var result = services.Where(s => s.SpecialtyId == _specialtyId);
+            return Task.FromResult(result);
         }
     }
 } 

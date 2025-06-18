@@ -96,6 +96,18 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
   // Xử lý thay đổi input
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'specialtyId') {
+      setFormData(prev => ({
+        ...prev,
+        specialtyId: value,
+        doctorId: '' // Reset doctorId khi đổi chuyên khoa
+      }));
+      if (errors['specialtyId']) {
+        setErrors(prev => ({ ...prev, specialtyId: '' }));
+      }
+      // Có thể load lại danh sách bác sĩ ở đây nếu cần
+      return;
+    }
     if (name === 'cost') {
       // Chỉ cho phép nhập số, loại bỏ ký tự không phải số
       const numericValue = value.replace(/[^0-9]/g, '');
@@ -200,21 +212,23 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
         return;
       }
 
-      // Tạo object dữ liệu gửi lên server
+      // Đảm bảo doctorId và specialtyId là số và là giá trị mới nhất
+      const doctorId = formData.doctorId && !isNaN(Number(formData.doctorId)) ? Number(formData.doctorId) : undefined;
+      const specialtyId = formData.specialtyId && !isNaN(Number(formData.specialtyId)) ? Number(formData.specialtyId) : undefined;
+
       const submissionData = {
         serviceId: editingService?.serviceId,
         serviceName: formData.serviceName || formData.name || '',
         description: formData.description || '',
         cost: parseInt(formData.cost.replace(/,/g, '')),
         duration: parseInt(formData.duration),
-        doctorId: parseInt(formData.doctorId),
-        specialtyId: parseInt(formData.specialtyId),
+        doctorId,
+        specialtyId,
         image: formData.image || null
       };
 
       console.log('Dữ liệu gửi đi:', submissionData);
 
-      // Sử dụng prop onSubmit đã được truyền vào
       await onSubmit(submissionData);
       onClose();
     } catch (error) {
@@ -282,15 +296,6 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
       }));
     }
   }, [specialties, editingService]);
-
-  useEffect(() => {
-    if (editingService && doctors.length > 0) {
-      setFormData(prev => ({
-        ...prev,
-        doctorId: String(editingService.doctorId),
-      }));
-    }
-  }, [doctors, editingService]);
 
   return (
     <>

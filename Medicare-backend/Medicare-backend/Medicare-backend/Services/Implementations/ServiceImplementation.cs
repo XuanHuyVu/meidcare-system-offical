@@ -1,100 +1,75 @@
+using AutoMapper;
+using Medicare_backend.DTOs;
 using Medicare_backend.Models;
-using Medicare_backend.Data;
+using Medicare_backend.Repositories;
 using Medicare_backend.Services.Interfaces;
-using Medicare_backend.Services.Pattern.Services.Strategies;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Medicare_backend.Services.Implementations
 {
-    public class ServiceImplementation : IService
+    public class ServiceImplementation : IServiceService
     {
-        private readonly ApplicationDbContext _context;
-        private IServiceSearchStrategy? _searchStrategy;
+        private readonly IServiceRepository _serviceRepository;
+        private readonly IMapper _mapper;
 
-        public ServiceImplementation(ApplicationDbContext context)
+        public ServiceImplementation(IServiceRepository serviceRepository, IMapper mapper)
         {
-            _context = context;
+            _serviceRepository = serviceRepository;
+            _mapper = mapper;
         }
 
-        public void SetSearchStrategy(IServiceSearchStrategy strategy)
+        public async Task<IEnumerable<ServiceDto>> GetAllAsync()
         {
-            _searchStrategy = strategy;
+            var services = await _serviceRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<ServiceDto>>(services);
         }
 
-        public async Task<IEnumerable<Service>> GetAllAsync()
+        public async Task<ServiceDto?> GetByIdAsync(int id)
         {
-            return await _context.Services
-                .Include(s => s.Specialty)
-                .Include(s => s.Doctor)
-                .OrderByDescending(s => s.ServiceId)
-                .ToListAsync();
+            var service = await _serviceRepository.GetByIdAsync(id);
+            if (service == null) return null;
+
+            return _mapper.Map<ServiceDto>(service);
         }
 
-        public async Task<Service?> GetByIdAsync(int id)
+        public async Task<ServiceDto> CreateAsync(ServiceDto serviceDto)
         {
-            return await _context.Services
-                .Include(s => s.Specialty)
-                .Include(s => s.Doctor)
-                .FirstOrDefaultAsync(s => s.ServiceId == id);
+            var service = _mapper.Map<Service>(serviceDto);
+            var created = await _serviceRepository.AddAsync(service);
+
+            return _mapper.Map<ServiceDto>(created);
         }
 
-        public async Task<Service> CreateAsync(Service service)
+        public async Task<bool> UpdateAsync(int id, ServiceDto serviceDto)
         {
-            _context.Services.Add(service);
-            await _context.SaveChangesAsync();
-            return service;
-        }
+            if (!await _serviceRepository.ExistsAsync(id)) return false;
 
-        public async Task<Service?> UpdateAsync(int id, Service service)
-        {
-            if (id != service.ServiceId)
-                return null;
+            var service = _mapper.Map<Service>(serviceDto);
+            service.ServiceId = id;
 
-            _context.Entry(service).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return service;
+            await _serviceRepository.UpdateAsync(service);
+            return true;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var service = await _context.Services.FindAsync(id);
-            if (service == null)
-                return false;
+            if (!await _serviceRepository.ExistsAsync(id)) return false;
 
-            _context.Services.Remove(service);
-            await _context.SaveChangesAsync();
+            await _serviceRepository.DeleteAsync(id);
             return true;
         }
 
-        public async Task<bool> ExistsAsync(int id)
+        public async Task<IEnumerable<ServiceDto>> SearchAsync(string searchTerm, int? specialtyId)
         {
-            return await _context.Services.AnyAsync(s => s.ServiceId == id);
-        }
-
-        public async Task<IEnumerable<Service>> SearchAsync(string searchTerm, int? specialtyId)
-        {
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                SetSearchStrategy(new ServiceNameSearchStrategy(searchTerm));
-            }
-            else if (specialtyId.HasValue)
-            {
-                SetSearchStrategy(new ServiceSpecialtySearchStrategy(specialtyId.Value));
-            }
-
-            if (_searchStrategy == null)
-            {
-                return await GetAllAsync();
-            }
-
-            var query = _context.Services
-                .Include(s => s.Doctor)
-                .Include(s => s.Specialty);
+            var services = await _serviceRepository.GetAllAsync();
+            var filteredServices = services.Where(s => 
+                (string.IsNullOrEmpty(searchTerm) || s.ServiceName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) &&
+                (!specialtyId.HasValue || s.SpecialtyId == specialtyId.Value)
+            );
             
-            return await _searchStrategy.SearchAsync(query);
+            return _mapper.Map<IEnumerable<ServiceDto>>(filteredServices);
         }
     }
-} 
+}

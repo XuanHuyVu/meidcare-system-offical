@@ -13,9 +13,10 @@ namespace Medicare_backend.Services.Pattern.Template
             _proxyService = proxyService;
         }
 
-        protected override async Task ValidateAsync(int id)
+        protected override Task ValidateAsync(int id)
         {
             // Có thể kiểm tra quyền hoặc điều kiện xóa ở đây nếu muốn
+            return Task.CompletedTask;
         }
 
         protected override async Task<int> SaveAsync(int id)
