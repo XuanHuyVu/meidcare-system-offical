@@ -68,8 +68,18 @@ namespace Medicare_backend.Repositories
         }
         public async Task UpdateAsync(Appointment appointment)
         {
-            _context.Entry(appointment).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            var existing = await _context.Appointments.FindAsync(appointment.AppointmentId);
+            if (existing != null)
+            {
+                existing.PatientId = appointment.PatientId;
+                existing.DoctorId = appointment.DoctorId;
+                existing.ServiceId = appointment.ServiceId;
+                existing.ClinicId = appointment.ClinicId;
+                existing.AppointmentDate = appointment.AppointmentDate;
+                existing.AppointmentTime = appointment.AppointmentTime;
+
+                await _context.SaveChangesAsync();
+            }
         }
         public async Task DeleteAsync(int id)
         {
