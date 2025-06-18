@@ -13,41 +13,43 @@ namespace Medicare_backend.Controllers.Coordinator
     [Authorize(Policy = "RequireCoordinatorRole")]
     public class ServicesController : ControllerBase
     {
-        private readonly IServiceService _serviceService;
-        public ServicesController(IServiceService serviceService)
+        private readonly IService _service;
+        public ServicesController(IService service)
         {
-            _serviceService = serviceService;
+            _service = service;
         }
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var result = await _serviceService.GetAllServicesAsync();
+            var result = await _service.GetAllAsync();
             return Ok(result);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await _serviceService.GetServiceByIdAsync(id);
+            var result = await _service.GetByIdAsync(id);
             if (result == null) return NotFound();
             return Ok(result);
         }
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Service service)
         {
-            var result = await _serviceService.CreateServiceAsync(service);
+            var result = await _service.CreateAsync(service);
             return CreatedAtAction(nameof(GetById), new { id = result.ServiceId }, result);
         }
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Service service)
         {
             if (id != service.ServiceId) return BadRequest();
-            var result = await _serviceService.UpdateServiceAsync(service);
+            var result = await _service.UpdateAsync(id, service);
+            if (result == null) return NotFound();
             return Ok(result);
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _serviceService.DeleteServiceAsync(id);
+            var result = await _service.DeleteAsync(id);
+            if (!result) return NotFound();
             return NoContent();
         }
     }

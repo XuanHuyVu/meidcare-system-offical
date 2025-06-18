@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { GetAllAsync } from '../../../api/WorkSchedulesApi';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { CreateAsync, DeleteAsync, GetAllAsync, GetByIdAsync, UpdateAsync } from '../../../api/WorkSchedulesApi';
 import '../../../style/WorkSchedules.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -9,167 +9,146 @@ import { debounce } from 'lodash';
 import WorkSchedulesForm from './WorkSchedulesForm';
 import WorkScheduleDetail from './WorkScheduleDetail';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:7130';
-
 const WorkSchedulesList = () => {
-  const [schedules, setSchedules] = useState([]);
+  const [workSchedules, setWorkSchedules] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  
-  // Form states
-  const [showForm, setShowForm] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState(null);
-  
-  // Modal states
-  const [deleteId, setDeleteId] = useState(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailSchedule, setDetailSchedule] = useState(null);
+  const [searchError, setSearchError] = useState('');
 
-  const fetchSchedules = React.useCallback(async () => {
+  const fetchWorkSchedules = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await GetAllAsync();
-      setSchedules(response.data || []);
+      const sortedSchedules = (response.data || []).sort((a, b) => new Date(b.workDate) - new Date(a.workDate));
+      console.log('Fetched schedules:', sortedSchedules); // Debug: Log the fetched schedules
+      setWorkSchedules(sortedSchedules);
     } catch (error) {
-      showError('Không thể tải danh sách lịch làm việc. Vui lòng thử lại sau.');
+      setErrorMessage('Không thể tải danh sách lịch làm việc. Vui lòng thử lại sau.');
+      setShowErrorModal(true);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchSchedules();
-  }, [fetchSchedules]);
+    fetchWorkSchedules();
+  }, [fetchWorkSchedules]);
 
-  const showError = (message) => {
-    setErrorMessage(message);
-    setShowErrorModal(true);
-  };
-
-  // API operations
-  const apiRequest = async (url, method, data = null) => {
-    const token = localStorage.getItem('token');
-    console.log('Token gửi lên:', token);
-    const config = {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` })
-      }
-    };
-    if (data) config.body = JSON.stringify(data);
-
-    const response = await fetch(url, config);
-    if (!response.ok) {
-      const errorMessages = {
-        401: 'Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.',
-        403: 'Bạn không có quyền thực hiện thao tác này.',
-        404: 'Dữ liệu không tồn tại.'
-      };
-      throw new Error(errorMessages[response.status] || 'Có lỗi xảy ra. Vui lòng thử lại sau.');
-    }
-
-    return method !== 'DELETE' ? response.json() : null;
-  };
-
-  // Form handlers
-  const handleAddSchedule = () => {
-    setEditingSchedule(null);
-    setShowForm(true);
-  };
-
-  const handleEditSchedule = (id) => {
-    const scheduleToEdit = schedules.find(s => s.scheduleId === id);
-    setEditingSchedule(scheduleToEdit);
-    setShowForm(true);
-  };
-
-  const handleCloseForm = () => {
-    setShowForm(false);
-    setEditingSchedule(null);
-  };
-
-  const handleSubmitForm = async (formData) => {
+  const handleAddWorkSchedule = async (scheduleData) => {
     try {
-      if (editingSchedule) {
-        // Update
-        await apiRequest(
-          `${API_BASE_URL}/api/coordinator/workschedules/${editingSchedule.scheduleId}`,
-          'PUT',
-          formData
-        );
-        await fetchSchedules(); // Refresh after update
-      } else {
-        // Create
-        const newSchedule = await apiRequest(
-          `${API_BASE_URL}/api/coordinator/workschedules`,
-          'POST',
-          formData
-        );
-        setSchedules(prev => [newSchedule, ...prev]);
-        await fetchSchedules();
-      }
-      handleCloseForm();
+      const response = await CreateAsync(scheduleData);
+      setWorkSchedules(prev => [response.data, ...prev]);
+      setShowAddForm(false);
+      setSuccessMessage('Tạo lịch làm việc thành công!');
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 2000);
     } catch (error) {
-      showError(error.message);
+      setErrorMessage('Tạo lịch làm việc thất bại. Vui lòng thử lại!');
+      setShowErrorModal(true);
     }
   };
 
-  // View detail
-  const handleViewSchedule = (id) => {
-    const scheduleToView = schedules.find(s => s.scheduleId === id);
-    if (scheduleToView) {
-      setDetailSchedule(scheduleToView);
+  const handleEditWorkSchedule = useCallback((schedule) => {
+    console.log('Editing schedule:', schedule); // Debug: Log the schedule being edited
+    setEditingSchedule({
+      scheduleId: schedule.scheduleId,
+      doctorId: schedule.doctorId || schedule.doctor?.doctorId || '',
+      specialtyId: schedule.specialtyId || schedule.specialty?.specialtyId || '',
+      clinicId: schedule.clinicId || schedule.clinic?.clinicId || '',
+      serviceId: schedule.serviceId || schedule.service?.serviceId || '',
+      workDate: schedule.workDate || '',
+      workTime: schedule.workTime || '',
+      status: schedule.status || 'Chưa có lịch', // Fallback to default if status is missing
+      doctorName: schedule.doctorName || schedule.doctor?.fullName || '',
+      specialtyName: schedule.specialtyName || schedule.specialty?.specialtyName || '',
+      clinicName: schedule.clinicName || schedule.clinic?.clinicName || '',
+      serviceName: schedule.serviceName || schedule.service?.serviceName || '',
+    });
+    setShowEditForm(true);
+  }, []);
+
+  const handleUpdateWorkSchedule = async (scheduleData) => {
+    try {
+      await UpdateAsync(scheduleData.scheduleId, scheduleData);
+      setWorkSchedules(prev => prev.map(schedule => 
+        schedule.scheduleId === scheduleData.scheduleId ? { ...schedule, ...scheduleData } : schedule
+      ));
+      setShowEditForm(false);
+      setEditingSchedule(null);
+      setSuccessMessage('Chỉnh sửa lịch làm việc thành công!');
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 2000);
+    } catch (error) {
+      setErrorMessage('Chỉnh sửa lịch làm việc thất bại. Vui lòng thử lại!');
+      setShowErrorModal(true);
+    }
+  };
+
+  const handleDeleteWorkSchedule = useCallback(async (id) => {
+    try {
+      await GetByIdAsync(id);
+      setPendingDeleteId(id);
+      setShowDeleteModal(true);
+    } catch (error) {
+      setErrorMessage('Không thể xóa lịch làm việc này. Vui lòng thử lại sau.');
+      setShowErrorModal(true);
+    }
+  }, []);
+
+  const handleConfirmDelete = async () => {
+    try {
+      await DeleteAsync(pendingDeleteId);
+      setWorkSchedules(prev => prev.filter(schedule => schedule.scheduleId !== pendingDeleteId));
+      setShowDeleteModal(false);
+      setPendingDeleteId(null);
+      setSuccessMessage('Xóa lịch làm việc thành công!');
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 2000);
+    } catch (error) {
+      setShowDeleteModal(false);
+      setErrorMessage('Xóa lịch làm việc thất bại. Vui lòng thử lại!');
+      setShowErrorModal(true);
+    }
+  };
+
+  const handleViewSchedule = useCallback((id) => {
+    const schedule = workSchedules.find(s => s.scheduleId === id);
+    if (schedule) {
+      setDetailSchedule(schedule);
       setShowDetailModal(true);
     } else {
-      showError('Không tìm thấy lịch làm việc.');
+      setErrorMessage('Không tìm thấy lịch làm việc.');
+      setShowErrorModal(true);
     }
-  };
+  }, [workSchedules]);
 
-  // Delete
-  const handleDeleteSchedule = (id) => {
-    setDeleteId(id);
-    setShowDeleteModal(true);
-  };
+  const debouncedSearch = useMemo(() => 
+    debounce((value) => {
+      setSearchTerm(value);
+      setCurrentPage(1);
+    }, 300)
+  , []);
 
-  const confirmDelete = async () => {
-    const schedule = schedules.find(s => s.scheduleId === deleteId);
-    if (schedule?.inUse) {
-      setShowDeleteModal(false);
-      showError('Không thể xóa lịch làm việc vì đã có bệnh nhân đặt lịch.');
-      return;
-    }
-
-    try {
-      await apiRequest(`${API_BASE_URL}/api/coordinator/workschedules/${deleteId}`, 'DELETE');
-      await fetchSchedules();
-      setShowDeleteModal(false);
-      alert('Xóa lịch làm việc thành công!');
-    } catch (error) {
-      showError(error.message);
-    }
-  };
-
-  // Search with debounce
-  const handleSearchChange = 
-  debounce((value) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
-  }, 300);
-
-  // Filtered and paginated data
   const filteredSchedules = useMemo(() => {
-    return schedules.filter(schedule =>
+    return workSchedules.filter(schedule =>
       Object.values(schedule).some(value => 
         value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
-  }, [schedules, searchTerm]);
+  }, [workSchedules, searchTerm]);
 
   const totalRecords = filteredSchedules.length;
   const totalPages = Math.ceil(totalRecords / pageSize);
@@ -187,44 +166,62 @@ const WorkSchedulesList = () => {
     setCurrentPage(1);
   };
 
+  const handleSearchClick = () => {
+    if (!searchTerm.trim()) {
+      setSearchError('Vui lòng nhập nội dung tìm kiếm');
+    } else {
+      setSearchError('');
+    }
+  };
+
   return (
     <div className="workschedules-list-container">
-      {/* Filter and Status */}
+      {showSuccessMessage && (
+        <div className="success-toast">
+          <div className="success-icon-bg">
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+              <circle cx="19" cy="19" r="19" fill="#32D53B"/>
+              <path d="M11 20.5L17 26.5L27 14.5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <span>{successMessage}</span>
+        </div>
+      )}
+
       <div className="workschedules-filter-card-full">
         <div className="status-filter-display">
           <div className="status-item scheduled">
-            <span className="counted">{schedules.filter(s => s.status === 'Đã đặt lịch').length}</span>
+            <span className="counted">{workSchedules.filter(s => s.status === 'Đã đặt lịch').length}</span>
             <span className="status-text">Đã đặt lịch</span>
           </div>
           <div className="status-item unscheduled">
-            <span className="count">{schedules.filter(s => s.status === 'Chưa có lịch').length}</span>
+            <span className="count">{workSchedules.filter(s => s.status === 'Chưa có lịch').length}</span>
             <span className="status-text">Chưa có lịch</span>
           </div>
         </div>
-        <div className="workschedules-search-group-right">
-          <input
-            type="text"
-            placeholder="Tìm kiếm"
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="search-input"
+        <div className="workschedules-search-group-right-full">
+          <input 
+            type="text" 
+            placeholder="Tìm kiếm" 
+            onChange={(e) => debouncedSearch(e.target.value)} 
+            className="workschedules-search-input"
           />
-          <span className="search-icon">
+          <span className="workschedules-search-icon" onClick={handleSearchClick}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8"></circle>
               <path d="m21 21-4.35-4.35"></path>
             </svg>
           </span>
+          {searchError && <span className="search-error">{searchError}</span>}
         </div>
       </div>
 
-      {/* Add Button */}
       <div className="add-work-schedule-btn-row-full">
-        <button className="add-work-schedule-btn-small" onClick={handleAddSchedule}>
+        <button className="add-work-schedule-btn-small" onClick={() => setShowAddForm(true)}>
           Tạo lịch làm việc
         </button>
       </div>
 
-      {/* Table */}
       <div className="workschedules-table-container workschedules-table-container-light">
         <table className="workschedules-table workschedules-table-no-col-border">
           <thead>
@@ -246,7 +243,7 @@ const WorkSchedulesList = () => {
             ) : currentSchedules.length > 0 ? (
               currentSchedules.map((schedule, index) => (
                 <tr key={schedule.scheduleId}>
-                  <td>{startIndex + index + 1}</td>
+                  <td className='index'>{startIndex + index + 1}</td>
                   <td>{schedule.doctorName}</td>
                   <td>{schedule.specialtyName}</td>
                   <td>{new Date(schedule.workDate).toLocaleDateString('vi-VN')}</td>
@@ -265,14 +262,14 @@ const WorkSchedulesList = () => {
                       </button>
                       <button
                         className="action-btn edit-btn"
-                        onClick={() => handleEditSchedule(schedule.scheduleId)}
+                        onClick={() => handleEditWorkSchedule(schedule)}
                         title="Chỉnh sửa"
                       >
                         <FontAwesomeIcon icon={faPen} />
                       </button>
                       <button
                         className="action-btn delete-btn"
-                        onClick={() => handleDeleteSchedule(schedule.scheduleId)}
+                        onClick={() => handleDeleteWorkSchedule(schedule.scheduleId)}
                         title="Xóa"
                       >
                         <FontAwesomeIcon icon={faTrash} />
@@ -288,7 +285,6 @@ const WorkSchedulesList = () => {
         </table>
       </div>
 
-      {/* Pagination */}
       <div className="pagination-row">
         <div className="pagination-info">
           <span>Hiển thị <b>{Math.min(startIndex + pageSize, totalRecords)}</b> bản ghi</span>
@@ -328,33 +324,53 @@ const WorkSchedulesList = () => {
         </div>
       </div>
 
-      {/* Modals */}
-      {showForm && (
+      {showAddForm && (
         <WorkSchedulesForm 
-          onClose={handleCloseForm} 
-          onSubmit={handleSubmitForm} 
-          editingSchedule={editingSchedule}
+          onClose={() => setShowAddForm(false)} 
+          onSubmit={handleAddWorkSchedule} 
         />
       )}
-
+      {showEditForm && (
+        <WorkSchedulesForm 
+          onClose={() => {
+            setShowEditForm(false);
+            setEditingSchedule(null);
+          }} 
+          editingSchedule={editingSchedule} 
+          onSubmit={handleUpdateWorkSchedule} 
+        />
+      )}
       <ConfirmModal
         isOpen={showDeleteModal}
         title="XÓA LỊCH LÀM VIỆC"
-        message="Bạn có chắc chắn muốn xóa lịch làm việc này không?"
-        onConfirm={confirmDelete}
-        onCancel={() => setShowDeleteModal(false)}
+        message={
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <svg width="50" height="50" viewBox="0 0 24 24" style={{ marginRight: '10px' }}>
+              <path d="M12 2L22 20H2L12 2Z" fill="#FFB636" />
+              <path d="M12 7V13M12 15.5H12.01" stroke="#2B3B47" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+            </svg>
+            Bạn có chắc chắn muốn xóa lịch làm việc này không?
+          </div>
+        }
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setShowDeleteModal(false);
+          setPendingDeleteId(null);
+        }}
       />
-
       <ErrorModal
         isOpen={showErrorModal}
+        title="LỖI"
         message={errorMessage}
         onClose={() => setShowErrorModal(false)}
       />
-
       <WorkScheduleDetail
         open={showDetailModal}
         schedule={detailSchedule}
-        onClose={() => setShowDetailModal(false)}
+        onClose={() => {
+          setShowDetailModal(false);
+          setDetailSchedule(null);
+        }}
       />
     </div>
   );

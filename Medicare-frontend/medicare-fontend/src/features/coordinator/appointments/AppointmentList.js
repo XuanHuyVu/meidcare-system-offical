@@ -1,4 +1,5 @@
 
+
 import React, { useEffect, useState } from "react";
 import {
   getAppointments,
@@ -134,9 +135,9 @@ const AppointmentList = () => {
   };
 
   const handleDeleteClick = (appointment) => {
-    const today = dayjs().startOf('day');
-    const appointmentDate = dayjs(appointment.appointmentDate).startOf('day');
-    
+    const today = dayjs().startOf("day");
+    const appointmentDate = dayjs(appointment.appointmentDate).startOf("day");
+
     if (appointmentDate.isSame(today)) {
       setSuccessMessageText("Không thể hủy lịch khám. Vui lòng thử lại sau!");
       setShowSuccessMessage(true);
@@ -146,7 +147,7 @@ const AppointmentList = () => {
       }, 3000);
       return;
     }
-    
+
     setAppointmentToDelete(appointment.appointmentId);
     setShowConfirmModal(true);
   };
@@ -273,19 +274,37 @@ const AppointmentList = () => {
       <Header />
 
       {showSuccessMessage && (
-        <div className={`success-toast ${successMessageText.includes("Không thể hủy lịch khám") ? 'error' : ''}`}>
-          {typeof successMessageText === 'string' ? (
+        <div
+          className={`success-toast ${
+            successMessageText.includes("Không thể hủy lịch khám")
+              ? "error"
+              : ""
+          }`}
+        >
+          {typeof successMessageText === "string" ? (
             <>
               <div className="success-icon-bg">
                 {successMessageText.includes("Không thể hủy lịch khám") ? (
                   <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-                    <circle cx="19" cy="19" r="19" fill="#FF4D4F"/>
-                    <path d="M24 14L14 24M14 14L24 24" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="19" cy="19" r="19" fill="#FF4D4F" />
+                    <path
+                      d="M24 14L14 24M14 14L24 24"
+                      stroke="white"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 ) : (
                   <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-                    <circle cx="19" cy="19" r="19" fill="#32D53B"/>
-                    <path d="M11 20.5L17 26.5L27 14.5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="19" cy="19" r="19" fill="#32D53B" />
+                    <path
+                      d="M11 20.5L17 26.5L27 14.5"
+                      stroke="white"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 )}
               </div>
@@ -300,7 +319,10 @@ const AppointmentList = () => {
       {/* Filter and Search */}
       <div className="appointment-list-filter-section">
         <div className="appointment-list-filter-checkbox-group">
-          <label htmlFor="status-filter" className="appointment-list-filter-checkbox-label">
+          <label
+            htmlFor="status-filter"
+            className="appointment-list-filter-checkbox-label"
+          >
             Trạng thái:&nbsp;
             <select
               id="status-filter"
@@ -412,7 +434,9 @@ const AppointmentList = () => {
                       {dayjs(appointment.appointmentDate).format("YYYY-MM-DD")}
                     </td>
                     <td>
-                      {dayjs(appointment.appointmentTime).format("HH:mm:ss")}
+                      {appointment.appointmentTime
+                        ? appointment.appointmentTime.substring(0, 5)
+                        : ""}
                     </td>
                     <td>
                       <div className="appointment-list-action-button">
@@ -481,10 +505,12 @@ const AppointmentList = () => {
             Trước
           </button>
           {[...Array(totalPages)].map((_, index) => (
-            <button 
-              key={index + 1} 
-              onClick={() => handlePageChange(index + 1)} 
-              className={`appointment-list-pagination-btn ${currentPage === index + 1 ? 'active' : ''}`}
+            <button
+              key={index + 1}
+              onClick={() => handlePageChange(index + 1)}
+              className={`appointment-list-pagination-btn ${
+                currentPage === index + 1 ? "active" : ""
+              }`}
             >
               {index + 1}
             </button>
