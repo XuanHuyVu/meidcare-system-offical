@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   getAppointments,
@@ -15,7 +14,7 @@ import Header from "../../../components/Header";
 import AppointmentForm from "./AppointmentForm";
 import AppointmentDetail from "./AppointmentDetail";
 import ConfirmModal from "../../../components/ConfirmModal";
-import "../../../style/AppointmentList.css";
+import "../../../style/AppointmentList.css";  
 import dayjs from "dayjs";
 import { FaInfoCircle, FaEdit, FaTrash } from "react-icons/fa";
 
