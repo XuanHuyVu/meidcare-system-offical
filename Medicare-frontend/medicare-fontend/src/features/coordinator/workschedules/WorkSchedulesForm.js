@@ -348,7 +348,7 @@ const WorkScheduleForm = ({ onClose, onSubmit, editingSchedule = null }) => {
       />
       {showErrorMessage && (
         <div className="error-toast">
-          <div className="error-icon">⚠a</div>
+          <div className="error-icon">⚠</div>
           <div>{errorMessage}</div>
           <button className="close-error" onClick={handleCloseError}>×</button>
         </div>
