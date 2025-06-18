@@ -13,5 +13,6 @@
         public int YearsOfExperience { get; set; }
         public string? Avatar { get; set; }
         public string? Bio { get; set; }
+        public int SpecialtyId { get; set; }
     }
 }

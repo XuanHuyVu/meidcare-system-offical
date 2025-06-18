@@ -1,24 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\review\\Medicare\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj": {}
+    "D:\\TLULearning\\HK4(Nam3_HK2)\\VDTT\\BTL\\meidcare-system-offical\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj": {}
   },
   "projects": {
-    "D:\\review\\Medicare\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj": {
+    "D:\\TLULearning\\HK4(Nam3_HK2)\\VDTT\\BTL\\meidcare-system-offical\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\review\\Medicare\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj",
+        "projectUniqueName": "D:\\TLULearning\\HK4(Nam3_HK2)\\VDTT\\BTL\\meidcare-system-offical\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj",
         "projectName": "Medicare_backend",
-        "projectPath": "D:\\review\\Medicare\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj",
-        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "D:\\review\\Medicare\\Medicare-backend\\Medicare-backend\\Medicare-backend\\obj\\",
+        "projectPath": "D:\\TLULearning\\HK4(Nam3_HK2)\\VDTT\\BTL\\meidcare-system-offical\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj",
+        "packagesPath": "C:\\Users\\nguye\\.nuget\\packages\\",
+        "outputPath": "D:\\TLULearning\\HK4(Nam3_HK2)\\VDTT\\BTL\\meidcare-system-offical\\Medicare-backend\\Medicare-backend\\Medicare-backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "D:\\review\\Medicare\\Medicare-backend\\Medicare-backend\\NuGet.Config",
-          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "D:\\TLULearning\\HK4(Nam3_HK2)\\VDTT\\BTL\\meidcare-system-offical\\Medicare-backend\\Medicare-backend\\NuGet.Config",
+          "C:\\Users\\nguye\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -45,7 +45,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -105,7 +105,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
