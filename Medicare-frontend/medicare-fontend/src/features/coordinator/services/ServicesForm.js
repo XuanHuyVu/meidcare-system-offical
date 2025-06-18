@@ -323,14 +323,14 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
               />
               {errors.name && <span className="error-message">{errors.name}</span>}
             </div>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="specialtyId">Chuyên khoa: <span className="required">*</span></label>
                 <select
                   id="specialtyId"
                   name="specialtyId"
-                  value={formData.specialtyId}
+                  value={formData.specialtyId || ""}
                   onChange={handleInputChange}
                   className={errors.specialtyId ? 'error' : ''}
                   disabled={loading}
@@ -345,6 +345,7 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
                 </select>
                 {errors.specialtyId && <span className="error-message">{errors.specialtyId}</span>}
               </div>
+
               <div className="form-group">
                 <label htmlFor="doctorId">Bác sĩ phụ trách: <span className="required">*</span></label>
                 <select
@@ -365,6 +366,7 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
                 {errors.doctorId && <span className="error-message">{errors.doctorId}</span>}
               </div>
             </div>
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="cost">Chi phí dịch vụ (VND): <span className="required">*</span></label>
@@ -381,6 +383,7 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
                 />
                 {errors.cost && <span className="error-message">{errors.cost}</span>}
               </div>
+
               <div className="form-group">
                 <label htmlFor="duration">Thời gian thực hiện (phút): <span className="required">*</span></label>
                 <input
@@ -397,6 +400,7 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
                 {errors.duration && <span className="error-message">{errors.duration}</span>}
               </div>
             </div>
+
             <div className="form-group">
               <label htmlFor="description">Mô tả dịch vụ:</label>
               <textarea
@@ -411,35 +415,42 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
               <div className="character-count">{formData.description.length}/500</div>
               {errors.description && <span className="error-message">{errors.description}</span>}
             </div>
+
             <div className="form-group image-upload-container">
               <label>Ảnh minh họa:</label>
-              <div className="image-upload-area image-upload-vertical">
+              <div className="image-upload-area">
                 {formData.image && (
-                  <img src={formData.image} alt="preview" className="preview-image" />
+                  <div className="image-preview-section">
+                    <img src={formData.image} alt="preview" className="preview-image" />
+                  </div>
                 )}
-                <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 16l-4-4-4 4"/><path d="M12 12v9"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 104 16.3"/></svg>
-                <div className="change-placeholder">Thay đổi ảnh minh họa</div>
-                <span>PNG, JPG, GIF</span>
-                <span className="change-image-btn" style={{ cursor: 'pointer', color: '#1D479A', textDecoration: 'underline', marginTop: 8, display: 'inline-block' }}>
-                  Chọn lại ảnh
-                </span>
+                <label htmlFor="image-upload-input" className="upload-label">
+                  <span className="upload-icon-block">
+                    <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 16l-4-4-4 4"/><path d="M12 12v9"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 104 16.3"/></svg>
+                  </span>
+                  <span className="upload-instruction-block">{formData.image ? 'Thay đổi ảnh minh họa' : 'Nhấp để chọn ảnh hoặc kéo thả tại đây'}</span>
+                  <span className="upload-hint-block">PNG, JPG, GIF</span>
+                </label>
                 <input
                   type="file"
-                  accept="image/png, image/jpg, image/jpeg, image/gif"
-                  style={{ display: 'none' }}
                   id="image-upload-input"
+                  accept="image/png, image/jpg, image/jpeg, image/gif"
                   onChange={handleImageUpload}
+                  className="file-input"
                 />
+                {formData.imageName && (
+                  <div className="file-info success inside-upload-area">
+                    <div className="file-info-left">
+                      <i className="fa-regular fa-image"></i>
+                      <span>{formData.imageName}</span>
+                    </div>
+                    <button type="button" className="remove-file-btn" onClick={handleRemoveImage}>×</button>
+                  </div>
+                )}
+                {errors.image && <span className="error-message">{errors.image}</span>}
               </div>
-              {formData.imageName && (
-                <div className="file-info success">
-                  <i className="fa-regular fa-image" style={{color: '#0db520', fontSize: 20, marginRight: 8}}></i>
-                  <span style={{flex: 1}}>{formData.imageName}</span>
-                  <button type="button" className="remove-file-btn" style={{color: '#e74c3c', fontSize: 22, background: 'none', border: 'none', cursor: 'pointer'}} onClick={handleRemoveImage}>&times;</button>
-                </div>
-              )}
-              {errors.image && <span className="error-message">{errors.image}</span>}
             </div>
+
             <div className="form-actions">
               <button type="submit" className="submit-btn">Xác nhận</button>
               <button type="button" className="cancel-btn" onClick={handleCancel}>Hủy bỏ</button>
@@ -447,6 +458,7 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
           </form>
         </div>
       </div>
+
       <ConfirmModal
         open={showCancelModal}
         title="XÁC NHẬN THOÁT"
@@ -454,10 +466,18 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
         onConfirm={onClose}
         onCancel={() => setShowCancelModal(false)}
       />
+
       {showSuccessMessage && (
         <div className="success-toast">
-          <div className="success-icon">✔</div>
-          <div>Sửa dịch vụ khám thành công</div>
+          <div className="success-icon-bg">
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+              <circle cx="19" cy="19" r="19" fill="#32D53B" />
+              <path d="M11 20.5L17 26.5L27 14.5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div className="success-message">
+            {editingService ? 'Cập nhật dịch vụ thành công!' : 'Thêm dịch vụ mới thành công!'}
+          </div>
         </div>
       )}
     </>

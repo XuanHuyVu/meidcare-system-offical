@@ -24,7 +24,7 @@ builder.Services.AddScoped<ISpecialtyService, SpecialtyService>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
-builder.Services.AddScoped<IServiceService, ServiceService>();
+builder.Services.AddScoped<IService, ServiceImplementation>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IWorkScheduleRepository, WorkScheduleRepository>();
