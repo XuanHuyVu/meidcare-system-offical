@@ -13,4 +13,4 @@ namespace Medicare_backend.Services.Interfaces
         Task<bool> UpdateAsync(int id, AppointmentDto dto);
         Task<bool> DeleteAsync(int id);
     }
-} 
+}
