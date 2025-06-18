@@ -1,4 +1,4 @@
-﻿namespace Medicare_backend.DTOs
+namespace Medicare_backend.DTOs
 {
     public class DoctorDto
     {
