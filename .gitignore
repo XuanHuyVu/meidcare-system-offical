@@ -9,5 +9,6 @@
 *.pdb
 *.json
 /Medicare-backend/Medicare-backend/Medicare-backend/appsettings.json
-
+/Medicare-backend/Medicare-backend/Medicare-backend/bin/
+/Medicare-backend/Medicare-backend/Medicare-backend/obj/
 
