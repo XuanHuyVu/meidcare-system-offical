@@ -6,13 +6,13 @@ using Medicare_backend.Repositories;
 using Medicare_backend.Services.Interfaces;
 using Medicare_backend.Services.Implementations;
 using Medicare_backend.Services;
-using Medicare_backend.Factories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
+using Medicare_backend.Services.Pattern.Factories;
 
 var builder = WebApplication.CreateBuilder(args);
 
