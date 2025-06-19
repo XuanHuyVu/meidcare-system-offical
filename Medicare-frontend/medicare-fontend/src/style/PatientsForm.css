@@ -17,3 +17,26 @@
   gap: 10px;
   justify-content: flex-end;
 }
+
+.patients-modal-header {
+  width: 100%;
+  background: #1d479a;
+  color: #fff;
+  padding: 4px 0;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.patients-modal-header .close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  margin-left: 16px;
+}
