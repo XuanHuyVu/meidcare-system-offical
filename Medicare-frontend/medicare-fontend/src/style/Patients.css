@@ -78,12 +78,12 @@
   outline: none;
 }
 
-.services-filter-group-left {
+.patients-filter-group-left {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.services-search-group-right {
+.patients-search-group-right {
   display: flex;
   align-items: center;
   gap: 0;
@@ -127,7 +127,7 @@
   border-left: none !important;
 }
 
-.modal-container {
+.patinets-modal-container {
   width: 650px !important; /* tăng chiều rộng */
   max-width: 95vw;
   min-height: 100px; /* giảm chiều dài tối thiểu */
@@ -206,7 +206,7 @@
   accent-color: #000; 
 }
 
-.modal-header {
+/* .modal-header {
   width: 100%;
   background: #1d479a;
   color: #fff;
@@ -227,7 +227,7 @@
   font-size: 2rem;
   cursor: pointer;
   margin-left: 16px;
-}
+} */
 
 .patients-form {
   padding: 0 32px;
