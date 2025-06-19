@@ -1,6 +1,6 @@
 .sidebar {
   width: 220px;
-  background: #1e429f; /* Màu nền sidebar */
+  background: #1d479a; /* Màu nền sidebar */
   color: #fff;
   height: 100vh;
   display: flex;
@@ -13,7 +13,7 @@
   justify-content: flex-start;
   align-items: center;
   padding: 0;
-  border-bottom: 1px solid #2e4fa2;
+  border-bottom: 1px solid #1d479a;
   background: #fff;
   width: 100%;
   height: 48px;
