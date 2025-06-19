@@ -44,13 +44,14 @@
   align-items: center;
   gap: 8px;
 }
-.workschedules-search-group-right {
+.workschedules-search-group-right-full {
   display: flex;
   align-items: center;
   gap: 0;
   position: relative;
+  width: 250px;
 }
-.search-input {
+.workschedules-search-input {
   padding: 8px 36px 8px 14px;
   border: 1px solid #dbe3ef;
   border-radius: 8px;
@@ -60,12 +61,13 @@
   outline: none;
   transition: border 0.2s;
 }
-.search-input:focus {
+.workschedules-search-input:focus, .workschedules-search-input:active {
   border-color: #1D479A;
 }
-.search-icon {
+.workschedules-search-icon {
   position: absolute;
   right: 12px;
+  padding-bottom: 5px;
   top: 50%;
   transform: translateY(-50%);
   color: #1D479A;
@@ -154,10 +156,11 @@
 .workschedules-table td {
   font-size: 15px;
   color: #222;
-  text-align: center;
+  text-align: left;
   padding: 13px 0;
   border: none;
   background: #fff;
+  padding-left: 30px;
 }
 .workschedules-table tbody tr {
   border-bottom: 1.5px solid #e6eaf2;
