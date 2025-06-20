@@ -39,7 +39,7 @@ const WorkScheduleForm = ({ onClose, onSubmit, editingSchedule = null }) => {
     workTime: '',
     clinicId: '',
     serviceId: '',
-    status: editingSchedule ? '' : undefined, // Only include status in edit mode
+    status: editingSchedule ? '' : undefined,
   });
   const [errors, setErrors] = useState({});
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -82,30 +82,50 @@ const WorkScheduleForm = ({ onClose, onSubmit, editingSchedule = null }) => {
     fetchDropdownData();
   }, [fetchDropdownData]);
 
+  // useEffect(() => {
+  //   console.log('Received editingSchedule:', editingSchedule); // Debug: Log the editingSchedule
+  //   if (editingSchedule) {
+  //     setFormData({
+  //       doctorId: editingSchedule.doctorId?.toString() || editingSchedule.doctor?.doctorId?.toString() || '',
+  //       specialtyId: editingSchedule.specialtyId?.toString() || editingSchedule.specialty?.specialtyId?.toString() || '',
+  //       workDate: editingSchedule.workDate ? new Date(editingSchedule.workDate).toISOString().split('T')[0] : '',
+  //       workTime: editingSchedule.workTime || '',
+  //       clinicId: editingSchedule.clinicId?.toString() || editingSchedule.clinic?.clinicId?.toString() || '',
+  //       serviceId: editingSchedule.serviceId?.toString() || editingSchedule.service?.serviceId?.toString() || '',
+  //       status: editingSchedule.status || '',
+  //     });
+  //   } else {
+  //     setFormData({
+  //       doctorId: '',
+  //       specialtyId: '',
+  //       workDate: '',
+  //       workTime: '',
+  //       clinicId: '',
+  //       serviceId: '',
+  //       status: undefined, // No status in create mode
+  //     });
+  //   }
+  // }, [editingSchedule]);
+
   useEffect(() => {
-    console.log('Received editingSchedule:', editingSchedule); // Debug: Log the editingSchedule
-    if (editingSchedule) {
-      setFormData({
-        doctorId: editingSchedule.doctorId?.toString() || editingSchedule.doctor?.doctorId?.toString() || '',
-        specialtyId: editingSchedule.specialtyId?.toString() || editingSchedule.specialty?.specialtyId?.toString() || '',
-        workDate: editingSchedule.workDate ? new Date(editingSchedule.workDate).toISOString().split('T')[0] : '',
-        workTime: editingSchedule.workTime || '',
-        clinicId: editingSchedule.clinicId?.toString() || editingSchedule.clinic?.clinicId?.toString() || '',
-        serviceId: editingSchedule.serviceId?.toString() || editingSchedule.service?.serviceId?.toString() || '',
-        status: editingSchedule.status || '',
-      });
-    } else {
-      setFormData({
-        doctorId: '',
-        specialtyId: '',
-        workDate: '',
-        workTime: '',
-        clinicId: '',
-        serviceId: '',
-        status: undefined, // No status in create mode
-      });
-    }
-  }, [editingSchedule]);
+  if (editingSchedule && doctors.length && specialties.length && clinics.length && services.length) {
+    const matchedDoctor = doctors.find(d => d.fullName === editingSchedule.doctorName);
+    const matchedSpecialty = specialties.find(s => s.specialtyName === editingSchedule.specialtyName);
+    const matchedClinic = clinics.find(c => c.clinicName === editingSchedule.clinicName);
+    const matchedService = services.find(sv => sv.serviceName === editingSchedule.serviceName);
+
+    setFormData({
+      doctorId: matchedDoctor?.doctorId?.toString() || '',
+      specialtyId: matchedSpecialty?.specialtyId?.toString() || '',
+      clinicId: matchedClinic?.clinicId?.toString() || '',
+      serviceId: matchedService?.serviceId?.toString() || '',
+      workDate: editingSchedule.workDate ? new Date(editingSchedule.workDate).toISOString().split('T')[0] : '',
+      workTime: editingSchedule.workTime || '',
+      status: editingSchedule.status || '',
+    });
+  }
+}, [editingSchedule, doctors, specialties, clinics, services]);
+
 
   const validateForm = useCallback(() => {
     const newErrors = {};

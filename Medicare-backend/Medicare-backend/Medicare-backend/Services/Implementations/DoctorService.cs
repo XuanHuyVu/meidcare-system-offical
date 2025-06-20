@@ -2,9 +2,9 @@ using AutoMapper;
 using Medicare_backend.DTOs;
 using Medicare_backend.Models;
 using Medicare_backend.Repositories;
-using Medicare_backend.Factories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Medicare_backend.Services.Pattern.Factories;
 
 namespace Medicare_backend.Services
 {

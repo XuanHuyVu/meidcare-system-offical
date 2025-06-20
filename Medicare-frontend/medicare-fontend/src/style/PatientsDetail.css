@@ -13,7 +13,7 @@
 }
 
 /* Modal container */
-.modal-container {
+.patients-modal-container {
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -24,14 +24,14 @@
 }
 
 /* Modal header */
-.modal-header {
+.patients-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 40px 60px;
   border-bottom: 1px solid #e5e5e5;
   background-color: #f8f9fa;
-  border-radius: 8px 8px 0 0;
+  border-radius: 12px 12px 0 0;
 }
 
 .modal-header h2 {
@@ -47,13 +47,13 @@
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
-  color: #666;
+  color: #ffffff;
   transition: all 0.2s ease;
 }
 
 .modal-header .close-btn:hover {
   background-color: #e9ecef;
-  color: #333;
+  color: #ffffff;
 }
 
 /* Form container */
