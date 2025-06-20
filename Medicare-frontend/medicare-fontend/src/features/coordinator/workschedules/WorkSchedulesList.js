@@ -55,6 +55,10 @@ const WorkSchedulesList = () => {
       setSuccessMessage('Tạo lịch làm việc thành công!');
       setShowSuccessMessage(true);
       setTimeout(() => setShowSuccessMessage(false), 2000);
+      setEditingSchedule(null);
+      setSearchTerm('');
+      setCurrentPage(1);
+      fetchWorkSchedules();
     } catch (error) {
       setErrorMessage('Tạo lịch làm việc thất bại. Vui lòng thử lại!');
       setShowErrorModal(true);
@@ -78,6 +82,7 @@ const WorkSchedulesList = () => {
       serviceName: schedule.serviceName || schedule.service?.serviceName || '',
     });
     setShowEditForm(true);
+    fetchWorkSchedules(); // Refresh the list to ensure latest data
   }, []);
 
   const handleUpdateWorkSchedule = async (scheduleData) => {
