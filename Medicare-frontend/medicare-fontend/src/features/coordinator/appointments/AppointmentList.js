@@ -16,7 +16,7 @@ import AppointmentDetail from "./AppointmentDetail";
 import ConfirmModal from "../../../components/ConfirmModal";
 import "../../../style/AppointmentList.css";  
 import dayjs from "dayjs";
-import { FaInfoCircle, FaEdit, FaTrash } from "react-icons/fa";
+import { FaInfoCircle, FaTrash, FaPen } from "react-icons/fa";
 import { useAppointmentTemplate } from "./useAppointmentTemplate";
 import { appointmentProxyApi } from "../../../api/AppointmentProxyApi";
 import { toast } from "react-toastify";
@@ -450,7 +450,7 @@ const AppointmentList = () => {
                           className="appointment-list-edit-btn"
                           title="Sửa"
                         >
-                          <FaEdit />
+                          <FaPen />
                         </button>
                         <button
                           key={`delete-${appointment.appointmentId}`}

@@ -161,6 +161,14 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    // Xóa lỗi của trường hiện tại khi người dùng bắt đầu nhập
+    if (value) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }));
+    }
+
     if (name === "serviceId") {
       setIsLoadingServices(true);
       const selectedService = services.find(
@@ -199,6 +207,12 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       (patient) => String(patient.patientId) === value
     );
 
+    // Xóa lỗi của trường patientName khi người dùng chọn bệnh nhân
+    setErrors(prev => ({
+      ...prev,
+      patientName: undefined
+    }));
+
     // Cập nhật patientId và patientName trong form
     setForm((prev) => ({
       ...prev,
@@ -210,13 +224,43 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
     setPatientExists(!!selectedPatient);
   };
 
+  // Xử lý thay đổi ngày khám
+  const handleDateChange = (date) => {
+    // Xóa lỗi của trường appointmentDate khi người dùng chọn ngày
+    setErrors(prev => ({
+      ...prev,
+      appointmentDate: undefined
+    }));
+
+    const selectedDate = dayjs(date).startOf('day');
+    const tomorrow = dayjs().add(1, 'day').startOf('day');
+    
+    if (selectedDate.isBefore(tomorrow)) {
+      setAppointmentDate(null);
+    } else {
+      setAppointmentDate(date);
+    }
+  };
+
+  // Xử lý thay đổi giờ khám
+  const handleTimeChange = (time) => {
+    // Xóa lỗi của trường appointmentTime khi người dùng chọn giờ
+    setErrors(prev => ({
+      ...prev,
+      appointmentTime: undefined
+    }));
+
+    setAppointmentTime(time);
+  };
+
   // Hàm kiểm tra tính hợp lệ của form
   const validateForm = () => {
     let formErrors = {};
     let isValid = true;
 
+    // Validation cho bệnh nhân
     if (!form.patientId || !form.patientName) {
-      formErrors.patientName = "Vui lòng chọn bệnh nhân.";
+      formErrors.patientName = "Tên bệnh nhân là bắt buộc.";
       isValid = false;
     }
 
@@ -225,8 +269,27 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       isValid = false;
     }
 
+    // Validation cho dịch vụ khám
+    if (!form.serviceId) {
+      formErrors.serviceId = "Dịch vụ khám là bắt buộc.";
+      isValid = false;
+    }
+
+    // Validation cho chuyên khoa
+    if (!form.specialtyId) {
+      formErrors.specialtyId = "Chuyên khoa là bắt buộc.";
+      isValid = false;
+    }
+
+    // Validation cho bác sĩ
+    if (!form.doctorId) {
+      formErrors.doctorId = "Bác sĩ phụ trách là bắt buộc.";
+      isValid = false;
+    }
+
+    // Validation cho ngày khám
     if (!appointmentDate) {
-      formErrors.appointmentDate = "Vui lòng chọn ngày khám.";
+      formErrors.appointmentDate = "Ngày khám là bắt buộc.";
       isValid = false;
     } else {
       const today = dayjs().format('YYYY-MM-DD');
@@ -238,33 +301,86 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
       }
     }
 
+    // Validation cho giờ khám
     if (!appointmentTime) {
-      formErrors.appointmentTime = "Vui lòng chọn giờ khám.";
+      formErrors.appointmentTime = "Giờ khám là bắt buộc.";
       isValid = false;
     }
 
+    // Validation cho phòng khám
     if (!form.clinicId) {
-      formErrors.clinicId = "Vui lòng chọn phòng khám.";
-      isValid = false;
-    }
-
-    if (!form.serviceId) {
-      formErrors.serviceId = "Vui lòng chọn dịch vụ khám.";
-      isValid = false;
-    }
-
-    if (!form.specialtyId) {
-      formErrors.specialtyId = "Vui lòng chọn chuyên khoa.";
-      isValid = false;
-    }
-
-    if (!form.doctorId) {
-      formErrors.doctorId = "Vui lòng chọn bác sĩ phụ trách.";
+      formErrors.clinicId = "Phòng khám là bắt buộc.";
       isValid = false;
     }
 
     setErrors(formErrors);
+    console.log('Form errors:', formErrors);
     return isValid;
+  };
+
+  // Hàm validation real-time cho từng trường
+  const validateField = (fieldName, value) => {
+    let fieldError = "";
+
+    switch (fieldName) {
+      case "patientId":
+        if (!value) {
+          fieldError = "Vui lòng chọn bệnh nhân.";
+        } else if (!patientExists) {
+          fieldError = "Bệnh nhân không tồn tại trong hệ thống.";
+        }
+        break;
+      case "serviceId":
+        if (!value) {
+          fieldError = "Dịch vụ khám là bắt buộc.";
+        }
+        break;
+      case "specialtyId":
+        if (!value) {
+          fieldError = "Chuyên khoa là bắt buộc.";
+        }
+        break;
+      case "doctorId":
+        if (!value) {
+          fieldError = "Bác sĩ phụ trách là bắt buộc.";
+        }
+        break;
+      case "clinicId":
+        if (!value) {
+          fieldError = "Phòng khám là bắt buộc.";
+        }
+        break;
+      case "appointmentDate":
+        if (!value) {
+          fieldError = "Ngày khám là bắt buộc.";
+        } else {
+          const today = dayjs().format('YYYY-MM-DD');
+          const selectedDate = dayjs(value).format('YYYY-MM-DD');
+          
+          if (selectedDate === today) {
+            fieldError = "Không thể đặt lịch khám trong ngày hiện tại.";
+          }
+        }
+        break;
+      case "appointmentTime":
+        if (!value) {
+          fieldError = "Giờ khám là bắt buộc.";
+        }
+        break;
+      default:
+        break;
+    }
+
+    return fieldError;
+  };
+
+  // Hàm xử lý blur event để validate real-time
+  const handleBlur = (fieldName, value) => {
+    const fieldError = validateField(fieldName, value);
+    setErrors(prev => ({
+      ...prev,
+      [fieldName]: fieldError
+    }));
   };
 
   // Submit form
@@ -333,16 +449,24 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
     }
   };
 
+  // Xử lý xác nhận hủy form
+  const handleConfirmCancel = () => {
+    setShowCancelModal(false);
+    setForm(initialForm);
+    setAppointmentDate(null);
+    setAppointmentTime(null);
+    setErrors({});
+    setPatientExists(true);
+    onClose();
+  };
+
   return (
     <>
       <ConfirmModal
         isOpen={showCancelModal}
         title="Xác nhận thoát"
         message={appointment ? "Bạn có muốn thoát khỏi chức năng sửa lịch khám không?" : "Bạn có muốn thoát khỏi chức năng thêm lịch khám không?"}
-        onConfirm={() => {
-          setShowCancelModal(false);
-          onClose();
-        }}
+        onConfirm={handleConfirmCancel}
         onCancel={() => setShowCancelModal(false)}
       />
 
@@ -357,7 +481,7 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
             {isLoadingForm ? (
               <div className="appointment-loading-message">Đang tải dữ liệu, vui lòng chờ...</div>
             ) : (
-              <form className="appointment-form" onSubmit={handleSubmit}>
+              <form className="appointment-form" onSubmit={handleSubmit} noValidate>
                 {errors.form && (
                   <div className="appointment-error-message">
                     {errors.form}
@@ -373,8 +497,9 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       name="serviceId"
                       value={form.serviceId}
                       onChange={handleChange}
-                      required
+                      onBlur={(e) => handleBlur("serviceId", e.target.value)}
                       disabled={isLoadingServices}
+                      className={errors.serviceId ? "appointment-input-error" : ""}
                     >
                       <option value="">{isLoadingServices ? "Đang tải..." : "Chọn dịch vụ"}</option>
                       {services.map((service) => (
@@ -395,7 +520,8 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       name="specialtyId"
                       value={form.specialtyId}
                       onChange={handleChange}
-                      required
+                      onBlur={(e) => handleBlur("specialtyId", e.target.value)}
+                      className={errors.specialtyId ? "appointment-input-error" : ""}
                     >
                       <option value="">Chọn khoa</option>
                       {specialties.map((s) => (
@@ -416,7 +542,8 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       name="doctorId"
                       value={form.doctorId}
                       onChange={handleChange}
-                      required
+                      onBlur={(e) => handleBlur("doctorId", e.target.value)}
+                      className={errors.doctorId ? "appointment-input-error" : ""}
                     >
                       <option value="">Chọn bác sĩ</option>
                       {doctors.map((doctor) => (
@@ -437,7 +564,8 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       name="patientId"
                       value={form.patientId}
                       onChange={handlePatientChange}
-                      required
+                      onBlur={(e) => handleBlur("patientId", e.target.value)}
+                      className={errors.patientName ? "appointment-input-error" : ""}
                     >
                       <option value="">Chọn bệnh nhân</option>
                       {patients.map((patient) => (
@@ -456,20 +584,11 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                     </label>
                     <DatePicker
                       selected={appointmentDate}
-                      onChange={(date) => {
-                        const selectedDate = dayjs(date).startOf('day');
-                        const tomorrow = dayjs().add(1, 'day').startOf('day');
-                        
-                        if (selectedDate.isBefore(tomorrow)) {
-                          setAppointmentDate(null);
-                        } else {
-                          setAppointmentDate(date);
-                        }
-                      }}
+                      onChange={handleDateChange}
+                      onBlur={() => handleBlur("appointmentDate", appointmentDate)}
                       dateFormat="yyyy-MM-dd"
                       placeholderText="Chọn ngày"
-                      className="form-control"
-                      required
+                      className={`form-control ${errors.appointmentDate ? 'appointment-input-error' : ''}`}
                       minDate={new Date(dayjs().add(1, 'day').format('YYYY-MM-DD'))}
                       maxDate={new Date(dayjs().add(30, 'day').format('YYYY-MM-DD'))}
                     />
@@ -483,25 +602,18 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                     </label>
                     <DatePicker
                       selected={appointmentTime}
-                      onChange={(time) => {
-                        setAppointmentTime(time);
-                        // Xóa lỗi khi người dùng thay đổi thời gian
-                        setErrors(prev => ({
-                          ...prev,
-                          appointmentTime: undefined
-                        }));
-                      }}
+                      onChange={handleTimeChange}
+                      onBlur={() => handleBlur("appointmentTime", appointmentTime)}
                       showTimeSelect
                       showTimeSelectOnly
                       timeIntervals={15}
                       timeCaption="Giờ"
                       dateFormat="HH:mm"
                       placeholderText="Chọn giờ"
-                      className={`form-control ${errors.appointmentTime ? 'is-invalid' : ''}`}
-                      required
+                      className={`form-control ${errors.appointmentTime ? 'appointment-input-error' : ''}`}
                     />
                     {errors.appointmentTime && (
-                      <p className="appointment-error-message" style={{ color: 'red', marginTop: '5px' }}>
+                      <p className="appointment-error-message">
                         {errors.appointmentTime}
                       </p>
                     )}
@@ -516,8 +628,9 @@ const AppointmentForm = ({ open, onClose, onSubmit, appointment }) => {
                       name="clinicId"
                       value={form.clinicId}
                       onChange={handleChange}
-                      required
+                      onBlur={(e) => handleBlur("clinicId", e.target.value)}
                       disabled={isLoadingClinics}
+                      className={errors.clinicId ? "appointment-input-error" : ""}
                     >
                       <option value="">{isLoadingClinics ? "Đang tải..." : "Chọn phòng khám"}</option>
                       {clinics.map((clinic) => (
