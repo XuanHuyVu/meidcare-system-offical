@@ -562,3 +562,16 @@
   box-shadow: 0 0 4px #0db52022;
   font-size: 15px;
 }
+
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+  border-color: #f44336;
+}
+
+.form-group input.error:focus,
+.form-group select.error:focus,
+.form-group textarea.error:focus {
+  border-color: #f44336;
+  box-shadow: 0 0 0 2px rgba(244,67,54,0.08);
+}
