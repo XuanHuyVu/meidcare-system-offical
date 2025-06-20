@@ -339,7 +339,6 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
                   onChange={handleInputChange}
                   className={errors.specialtyId ? 'error' : ''}
                   disabled={loading}
-                  required
                 >
                   <option value="" disabled hidden>-- Chọn chuyên khoa --</option>
                   {specialties.map((spec) => (
@@ -359,7 +358,6 @@ const ServicesForm = ({ onClose, onSubmit, editingService = null }) => {
                   value={formData.doctorId || ""}
                   onChange={handleInputChange}
                   className={errors.doctorId ? 'error' : ''}
-                  required
                 >
                   <option key="default" value="" disabled hidden>--Chọn bác sĩ--</option>
                   {doctors.map((doctor) => (

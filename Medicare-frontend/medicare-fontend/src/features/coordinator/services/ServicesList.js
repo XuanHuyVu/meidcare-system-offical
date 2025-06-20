@@ -276,12 +276,12 @@ const ServicesList = () => {
           {typeof successMessageText === 'string' ? (
             <>
               <div className="success-icon-bg">
-                <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-                  <circle cx="19" cy="19" r="19" fill="#32D53B"/>
-                  <path d="M11 20.5L17 26.5L27 14.5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                  <circle cx="28" cy="28" r="28" fill="#32D53B"/>
+                  <path d="M16 30.5L26 40.5L44 20.5" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <span>{successMessageText}</span>
+              <div className="success-message">{successMessageText}</div>
             </>
           ) : (
             successMessageText

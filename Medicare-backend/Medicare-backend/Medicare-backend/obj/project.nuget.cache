@@ -1,8 +1,14 @@
 {
   "version": 2,
+<<<<<<< Updated upstream
   "dgSpecHash": "cBNLHCTXwHk=",
   "success": true,
   "projectFilePath": "E:\\CacVandeTienTien\\Nhap3\\meidcare-system-offical\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj",
+=======
+  "dgSpecHash": "yKbG2jMltFU=",
+  "success": true,
+  "projectFilePath": "E:\\CacVandeTienTien\\CVDTT\\meidcare-system-offical\\Medicare-backend\\Medicare-backend\\Medicare-backend\\Medicare_backend.csproj",
+>>>>>>> Stashed changes
   "expectedPackageFiles": [
     "C:\\Users\\QUANG HIEU\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\QUANG HIEU\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
